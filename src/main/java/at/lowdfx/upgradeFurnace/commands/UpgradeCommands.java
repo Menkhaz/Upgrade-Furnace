@@ -185,6 +185,8 @@ public class UpgradeCommands implements Listener {
         if (!(block.getState() instanceof Furnace furnace)) return;
         ItemStack item = evt.getItemInHand();
         ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+
         PersistentDataContainer container = meta.getPersistentDataContainer();
         if (container.has(KEY_LEVEL, PersistentDataType.INTEGER)) {
             int level = container.get(KEY_LEVEL, PersistentDataType.INTEGER);
@@ -205,13 +207,18 @@ public class UpgradeCommands implements Listener {
 
     private static void removeHologram(Furnace furnace) {
         PersistentDataContainer pdc = furnace.getPersistentDataContainer();
+
         if (!pdc.has(KEY_HOLO, PersistentDataType.STRING)) return;
+
         String uuidStr = pdc.get(KEY_HOLO, PersistentDataType.STRING);
+        if (uuidStr == null) return;
+
         try {
             UUID uuid = UUID.fromString(uuidStr);
             Entity e = furnace.getWorld().getEntity(uuid);
             if (e != null) e.remove();
         } catch (Exception ignored) {}
+
         pdc.remove(KEY_HOLO);
         furnace.update();
     }
