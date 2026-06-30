@@ -165,7 +165,16 @@ public class UpgradeCommands implements Listener {
             default -> "Furnace";
         };
 
-        meta.displayName(Component.text("Upgraded " + furnaceName + " Lvl " + level, NamedTextColor.GOLD));
+        String tierName = switch (level) {
+            case 1 -> "Copper";
+            case 2 -> "Iron";
+            case 3 -> "Gold";
+            case 4 -> "Diamond";
+            case 5 -> "Netherite";
+            default -> "";
+        };
+
+        meta.displayName(Component.text(tierName + " " + furnaceName, NamedTextColor.GOLD));
         dropped.setItemMeta(meta);
         block.getWorld().dropItemNaturally(block.getLocation(), dropped);
     }
