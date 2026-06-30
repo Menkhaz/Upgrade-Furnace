@@ -81,8 +81,8 @@ public class Configuration {
         return REQUIRE_XP_LEVELS.getOrDefault(level, 0);
     }
 
-    public static int getSpeedMultiplier(int level) {
-        return SPEED_MULTIPLIER.getOrDefault(level, level + 1);
+    public static double getSpeedMultiplier(int level) {
+        return CONFIG.getDouble("upgrades." + level + ".speed_multiplier", 1.0);
     }
 
     public static Particle getParticle(int level) {

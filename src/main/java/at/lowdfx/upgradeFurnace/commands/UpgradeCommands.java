@@ -124,8 +124,9 @@ public class UpgradeCommands implements Listener {
         Furnace furnace = (Furnace) evt.getBlock().getState();
         int lvl = furnace.getPersistentDataContainer().getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
         if (lvl < 1) return;
-        int speedMultiplier = Configuration.getSpeedMultiplier(lvl);
-        evt.setTotalCookTime(evt.getTotalCookTime() / speedMultiplier);
+        double speedMultiplier = Configuration.getSpeedMultiplier(lvl);
+        int newCookTime = Math.max(1, (int) Math.round(evt.getTotalCookTime() / speedMultiplier));
+        evt.setTotalCookTime(newCookTime);
     }
 
     @EventHandler
