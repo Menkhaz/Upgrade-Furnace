@@ -22,7 +22,7 @@ public class Configuration {
     public static final Map<Integer, Material> REQUIRE_MATERIAL = new HashMap<>();
     public static final Map<Integer, Integer> REQUIRE_AMOUNT = new HashMap<>();
     public static final Map<Integer, Integer> REQUIRE_XP_LEVELS = new HashMap<>();
-    public static final Map<Integer, Integer> SPEED_MULTIPLIER = new HashMap<>();
+    public static final Map<Integer, Double> SPEED_MULTIPLIER = new HashMap<>();
     public static final Map<Integer, Particle> PARTICLE = new HashMap<>();
 
     public static void init(@NotNull JavaPlugin plugin) {
@@ -49,7 +49,7 @@ public class Configuration {
                     String matName = CONFIG.getString("requirements." + key + ".material");
                     int amount = CONFIG.getInt("requirements." + key + ".amount");
                     int xp = CONFIG.getInt("requirements." + key + ".xp_levels", 0);
-                    int speed = CONFIG.getInt("requirements." + key + ".speed_multiplier", level + 1);
+                    double speed = CONFIG.getDouble("requirements." + key + ".speed_multiplier", level + 1.0);
                     String particleName = CONFIG.getString("requirements." + key + ".particle", "SMOKE");
 
                     REQUIRE_MATERIAL.put(level, Material.valueOf(matName.toUpperCase()));
@@ -82,7 +82,7 @@ public class Configuration {
     }
 
     public static double getSpeedMultiplier(int level) {
-        return CONFIG.getDouble("upgrades." + level + ".speed_multiplier", 1.0);
+        return SPEED_MULTIPLIER.getOrDefault(level, 1.0);
     }
 
     public static Particle getParticle(int level) {
