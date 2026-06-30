@@ -3,6 +3,7 @@ package at.lowdfx.upgradeFurnace;
 import at.lowdfx.upgradeFurnace.util.Configuration;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.block.Furnace;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -34,14 +35,20 @@ public class FurnaceParticleManager {
             @Override
             public void run() {
                 tick++;
+
                 furnaces.forEach((location, level) -> {
                     if (location.getWorld() == null) return;
                     if (!location.getWorld().isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) return;
 
+                    if (Configuration.PARTICLES_ONLY_WHEN_ACTIVE) {
+                        if (!(location.getBlock().getState() instanceof Furnace furnace)) return;
+                        if (furnace.getBurnTime() <= 0) return;
+                    }
+
                     spawnSpiralParticles(location, level);
                 });
             }
-        }.runTaskTimer(UpgradeFurnace.PLUGIN, 0L, 2L); // Alle 2 Ticks (10x pro Sekunde)
+        }.runTaskTimer(UpgradeFurnace.PLUGIN, 0L, 2L);
     }
 
     /**
@@ -60,7 +67,7 @@ public class FurnaceParticleManager {
      */
     public void registerFurnace(Location location, int level) {
         if (level < 1) return;
-        // Normalisiere die Location (Block-Koordinaten)
+
         Location blockLoc = location.getBlock().getLocation();
         furnaces.put(blockLoc, level);
     }
@@ -95,7 +102,7 @@ public class FurnaceParticleManager {
         // Level-basierte Parameter
         double speed = getSpeedForLevel(level);
         double maxHeight = getHeightForLevel(level);
-        double windungen = getWindungenForLevel(level);
+        double turns = getTurnsForLevel(level);
         Particle particle = Configuration.getParticle(level);
 
         // Anzahl der Partikel-Punkte pro Frame (höheres Level = mehr Partikel)
@@ -106,14 +113,14 @@ public class FurnaceParticleManager {
             double armOffset = (2 * Math.PI / particleCount) * i;
 
             // Berechne Position auf der Spirale
-            double progress = (tick * speed) % (2 * Math.PI * windungen);
+            double progress = (tick * speed) % (2 * Math.PI * turns);
             double angle = progress + armOffset;
 
             // Radius variiert leicht für interessantere Animation
             double radius = 0.5 + 0.1 * Math.sin(tick * 0.1);
 
             // Berechne Y-Position (aufsteigend)
-            double heightProgress = (progress / (2 * Math.PI * windungen));
+            double heightProgress = (progress / (2 * Math.PI * turns));
             double y = heightProgress * maxHeight;
 
             // Berechne X und Z auf dem Kreis
@@ -163,9 +170,9 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Gibt die Anzahl der Windungen für das Level zurück.
+     * Gibt die Anzahl der turns für das Level zurück.
      */
-    private double getWindungenForLevel(int level) {
+    private double getTurnsForLevel(int level) {
         return switch (level) {
             case 1 -> 1.0;
             case 2 -> 1.5;

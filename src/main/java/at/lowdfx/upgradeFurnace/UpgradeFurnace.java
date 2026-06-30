@@ -17,7 +17,6 @@ import xyz.xenondevs.invui.InvUI;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 @SuppressWarnings({ "UnstableApiUsage", "ResultOfMethodCallIgnored" })
 public final class UpgradeFurnace extends JavaPlugin {
@@ -47,9 +46,15 @@ public final class UpgradeFurnace extends JavaPlugin {
 
         Perms.loadPermissions();
 
-        // Partikel-Manager starten
-        PARTICLE_MANAGER = new FurnaceParticleManager();
-        PARTICLE_MANAGER.start();
+        // Start particle manager if enabled
+        if (Configuration.PARTICLES_ENABLED) {
+            LOG.info("Starting FurnaceParticleManager...");
+            PARTICLE_MANAGER = new FurnaceParticleManager();
+            PARTICLE_MANAGER.start();
+            FurnaceLoader.registerLoadedFurnaces();
+
+            getServer().getPluginManager().registerEvents(new FurnaceLoader(), this);
+        }
 
         // Plugin Updater
         String updateUrl = "https://raw.githubusercontent.com/LowdFX/Upgrade-Furnace/refs/heads/main/update.txt";

@@ -107,7 +107,9 @@ public class UpgradeCommands implements Listener {
 
                     removeHologram(furnace);
                     spawnHologram(furnace, next);
-                    UpgradeFurnace.PARTICLE_MANAGER.updateFurnace(furnace.getLocation(), next);
+                    if (UpgradeFurnace.PARTICLE_MANAGER != null) {
+                        UpgradeFurnace.PARTICLE_MANAGER.updateFurnace(furnace.getLocation(), next);
+                    }
 
                     Utilities.positiveSound(player);
                     player.sendMessage(UpgradeFurnace.serverMessage(
@@ -153,7 +155,9 @@ public class UpgradeCommands implements Listener {
         int level = pdc.getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
         removeHologram(furnace);
         // Aus Partikel-Animation entfernen
-        UpgradeFurnace.PARTICLE_MANAGER.unregisterFurnace(furnace.getLocation());
+        if (UpgradeFurnace.PARTICLE_MANAGER != null) {
+            UpgradeFurnace.PARTICLE_MANAGER.unregisterFurnace(furnace.getLocation());
+        }
         furnace.update();
         evt.setDropItems(false);
         Material furnaceType = block.getType();
@@ -197,7 +201,9 @@ public class UpgradeCommands implements Listener {
             furnace.update();
             spawnHologram(furnace, level);
             // Für Partikel-Animation registrieren
-            UpgradeFurnace.PARTICLE_MANAGER.registerFurnace(furnace.getLocation(), level);
+            if (UpgradeFurnace.PARTICLE_MANAGER != null) {
+                UpgradeFurnace.PARTICLE_MANAGER.registerFurnace(furnace.getLocation(), level);
+            }
         }
     }
 

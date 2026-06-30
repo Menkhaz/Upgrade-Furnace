@@ -4,26 +4,37 @@
 ##_________________ | |    / _ \\ \ /\ / // _` || |_    \  /  _________________##
 ##_________________ | |___| (_) |\ V  V /| (_| ||  _|   /  \  _________________##
 ##_________________ |_____|\___/  \_/\_/  \__,_||_|    /_/\_\ _________________##
-##                                Configuration                                ##
+##                               Configuration                                ##
 #################################################################################
 
-language: "de"
-## Alle Nachrichten, wenn Spieler den Server betreten oder verlassen.
-# Im MiniMessage format: https://docs.advntr.dev/minimessage/index.html.
-# Der Placeholder "{0}" ist der Spielername.
+language: "en"
 
-## Allgemeine Einstellungen.
+## General settings.
 basic:
 
-  # Steht vor jeder Befehlsnachricht.
+  # Prefix used before plugin messages.
   server-name: "LoudCraft"
 
-  # Custom /help Befehl vom Plugin an/aus
+  # Enable or disable the plugin's custom /help command.
   customhelp: true
 
-## Öfen Einstellungen.
-# speed_multiplier: Teilt die Koch-Zeit (höher = schneller)
-# particle: Partikel-Effekt beim Upgrade und Schmelzen
+## Particle settings.
+particles:
+
+  # Enable or disable all furnace particle effects.
+  enabled: true
+
+  # Only display particles while the furnace is actively smelting.
+  only_when_active: false
+
+## Furnace upgrade settings.
+#
+# speed_multiplier:
+#   Divides the furnace cook time.
+#   Higher values = faster smelting.
+#
+# particle:
+#   Particle effect displayed for this upgrade tier.
 requirements:
   1:
     material: COPPER_INGOT
@@ -31,28 +42,31 @@ requirements:
     xp_levels: 5
     speed_multiplier: 1.15
     particle: SMOKE
+
   2:
     material: IRON_INGOT
     amount: 24
     xp_levels: 10
     speed_multiplier: 1.35
     particle: FLAME
+
   3:
     material: GOLD_INGOT
     amount: 16
     xp_levels: 15
     speed_multiplier: 2.0
     particle: CLOUD
+
   4:
     material: DIAMOND
     amount: 8
     xp_levels: 20
     speed_multiplier: 4.0
     particle: SOUL_FIRE_FLAME
+
   5:
     material: NETHERITE_INGOT
     amount: 1
     xp_levels: 30
     speed_multiplier: 8.0
     particle: TOTEM_OF_UNDYING
-

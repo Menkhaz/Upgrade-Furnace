@@ -11,14 +11,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class Configuration {
     public static FileConfiguration CONFIG;
 
     public static String BASIC_SERVER_NAME;
     public static boolean BASIC_CUSTOM_HELP;
 
-    // Upgrade-Anforderungen aus der Config geladen
+    public static boolean PARTICLES_ENABLED;
+    public static boolean PARTICLES_ONLY_WHEN_ACTIVE;
+
+    // Upgrade requirements loaded from the config
     public static final Map<Integer, Material> REQUIRE_MATERIAL = new HashMap<>();
     public static final Map<Integer, Integer> REQUIRE_AMOUNT = new HashMap<>();
     public static final Map<Integer, Integer> REQUIRE_XP_LEVELS = new HashMap<>();
@@ -35,12 +37,16 @@ public class Configuration {
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");
         BASIC_CUSTOM_HELP = CONFIG.getBoolean("basic.customhelp", true);
 
-        // Upgrade-Anforderungen laden
+        PARTICLES_ENABLED = CONFIG.getBoolean("particles.enabled", true);
+        PARTICLES_ONLY_WHEN_ACTIVE = CONFIG.getBoolean("particles.only_when_active", true);
+
+        // Load upgrade requirements
         REQUIRE_MATERIAL.clear();
         REQUIRE_AMOUNT.clear();
         REQUIRE_XP_LEVELS.clear();
         SPEED_MULTIPLIER.clear();
         PARTICLE.clear();
+
         ConfigurationSection section = CONFIG.getConfigurationSection("requirements");
         if (section != null) {
             for (String key : section.getKeys(false)) {
@@ -56,14 +62,15 @@ public class Configuration {
                     REQUIRE_AMOUNT.put(level, amount);
                     REQUIRE_XP_LEVELS.put(level, xp);
                     SPEED_MULTIPLIER.put(level, speed);
+
                     try {
                         PARTICLE.put(level, Particle.valueOf(particleName.toUpperCase()));
                     } catch (IllegalArgumentException e) {
                         PARTICLE.put(level, Particle.SMOKE);
-                        UpgradeFurnace.LOG.warn("Ungültiger Partikel '{}' für Level {}, verwende SMOKE", particleName, level);
+                        UpgradeFurnace.LOG.warn("Invalid particle '{}' for level {}, using SMOKE instead.", particleName, level);
                     }
                 } catch (Exception ignored) {
-                    // Ungültiger Eintrag überspringen
+                    // Skip invalid entries
                 }
             }
         }
