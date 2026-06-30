@@ -189,7 +189,8 @@ public class UpgradeCommands implements Listener {
 
         PersistentDataContainer container = meta.getPersistentDataContainer();
         if (container.has(KEY_LEVEL, PersistentDataType.INTEGER)) {
-            int level = container.get(KEY_LEVEL, PersistentDataType.INTEGER);
+            Integer level = container.get(KEY_LEVEL, PersistentDataType.INTEGER);
+            if (level == null) return;
             PersistentDataContainer pdc = furnace.getPersistentDataContainer();
             pdc.set(KEY_LEVEL, PersistentDataType.INTEGER, level);
             furnace.update();
