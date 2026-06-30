@@ -47,72 +47,75 @@ public class UpgradeCommands implements Listener {
                     CommandSender s = src.getSender();
                     return s instanceof Player && Perms.check(src, Perm.UPGRADE_FURNACE);
                 })
-                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("furnace")
-                        .executes(ctx -> {
-                            Player player = (Player) ctx.getSource().getSender();
-                            Furnace furnace = getTargetFurnace(player);
-                            if (furnace == null) {
-                                Utilities.negativeSound(player);
-                                player.sendMessage(UpgradeFurnace.serverMessage(
-                                        Component.text("Schau auf einen Ofen!", NamedTextColor.RED)
-                                ));
+                .executes(ctx -> {
+                    Player player = (Player) ctx.getSource().getSender();
+                    Furnace furnace = getTargetFurnace(player);
 
-                                return 0;
-                            }
-                            PersistentDataContainer pdc = furnace.getPersistentDataContainer();
-                            int current = pdc.getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
-                            if (current >= 5) {
-                                Utilities.negativeSound(player);
-                                player.sendMessage(UpgradeFurnace.serverMessage(
-                                        Component.text("Dieser Ofen ist bereits auf höchstem Level!", NamedTextColor.YELLOW)
-                                ));
+                    if (furnace == null) {
+                        Utilities.negativeSound(player);
+                        player.sendMessage(UpgradeFurnace.serverMessage(
+                                Component.text("Schau auf einen Ofen!", NamedTextColor.RED)
+                        ));
+                        return 0;
+                    }
 
-                                return 1;
-                            }
-                            int next = current + 1;
-                            Material mat = Configuration.getRequirementMaterial(next);
-                            int req = Configuration.getRequirementAmount(next);
-                            int xpReq = Configuration.getRequirementXpLevels(next);
-                            if (mat == null) {
-                                Utilities.negativeSound(player);
-                                player.sendMessage(UpgradeFurnace.serverMessage(
-                                        Component.text("Fehler in der Config: Material ungültig", NamedTextColor.RED)
-                                ));
+                    PersistentDataContainer pdc = furnace.getPersistentDataContainer();
+                    int current = pdc.getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
 
-                                return 0;
-                            }
-                            if (!player.getInventory().contains(mat, req)) {
-                                Utilities.negativeSound(player);
-                                player.sendMessage(UpgradeFurnace.serverMessage(
-                                        Component.text("Du brauchst " + req + " " + mat.name().toLowerCase() + " für Level " + next, NamedTextColor.RED)
-                                ));
+                    if (current >= 5) {
+                        Utilities.negativeSound(player);
+                        player.sendMessage(UpgradeFurnace.serverMessage(
+                                Component.text("Dieser Ofen ist bereits auf höchstem Level!", NamedTextColor.YELLOW)
+                        ));
+                        return 1;
+                    }
 
-                                return 0;
-                            }
-                            if (xpReq > 0 && player.getLevel() < xpReq) {
-                                Utilities.negativeSound(player);
-                                player.sendMessage(UpgradeFurnace.serverMessage(
-                                        Component.text("Du benötigst mindestens " + xpReq + " Erfahrungslevel für Level " + next, NamedTextColor.RED)
-                                ));
+                    int next = current + 1;
+                    Material mat = Configuration.getRequirementMaterial(next);
+                    int req = Configuration.getRequirementAmount(next);
+                    int xpReq = Configuration.getRequirementXpLevels(next);
 
-                                return 0;
-                            }
-                            player.getInventory().removeItem(new ItemStack(mat, req));
-                            if (xpReq > 0) player.giveExpLevels(-xpReq);
-                            pdc.set(KEY_LEVEL, PersistentDataType.INTEGER, next);
-                            furnace.update();
-                            removeHologram(furnace);
-                            spawnHologram(furnace, next);
-                            // Für Partikel-Animation registrieren
-                            UpgradeFurnace.PARTICLE_MANAGER.updateFurnace(furnace.getLocation(), next);
-                            Utilities.positiveSound(player);
-                            player.sendMessage(UpgradeFurnace.serverMessage(
-                                    Component.text("Ofen auf Level " + next + " geupgraded!", NamedTextColor.GREEN)
-                            ));
+                    if (mat == null) {
+                        Utilities.negativeSound(player);
+                        player.sendMessage(UpgradeFurnace.serverMessage(
+                                Component.text("Fehler in der Config: Material ungültig.", NamedTextColor.RED)
+                        ));
+                        return 0;
+                    }
 
-                            return 1;
-                        })
-                )
+                    if (!player.getInventory().contains(mat, req)) {
+                        Utilities.negativeSound(player);
+                        player.sendMessage(UpgradeFurnace.serverMessage(
+                                Component.text("Du brauchst " + req + " " + mat.name().toLowerCase() + " für Level " + next, NamedTextColor.RED)
+                        ));
+                        return 0;
+                    }
+
+                    if (xpReq > 0 && player.getLevel() < xpReq) {
+                        Utilities.negativeSound(player);
+                        player.sendMessage(UpgradeFurnace.serverMessage(
+                                Component.text("Du benötigst mindestens " + xpReq + " Erfahrungslevel für Level " + next, NamedTextColor.RED)
+                        ));
+                        return 0;
+                    }
+
+                    player.getInventory().removeItem(new ItemStack(mat, req));
+                    if (xpReq > 0) player.giveExpLevels(-xpReq);
+
+                    pdc.set(KEY_LEVEL, PersistentDataType.INTEGER, next);
+                    furnace.update();
+
+                    removeHologram(furnace);
+                    spawnHologram(furnace, next);
+                    UpgradeFurnace.PARTICLE_MANAGER.updateFurnace(furnace.getLocation(), next);
+
+                    Utilities.positiveSound(player);
+                    player.sendMessage(UpgradeFurnace.serverMessage(
+                            Component.text("Ofen auf Level " + next + " geupgraded!", NamedTextColor.GREEN)
+                    ));
+
+                    return 1;
+                })
                 .build();
     }
 
@@ -152,10 +155,17 @@ public class UpgradeCommands implements Listener {
         UpgradeFurnace.PARTICLE_MANAGER.unregisterFurnace(furnace.getLocation());
         furnace.update();
         evt.setDropItems(false);
-        ItemStack dropped = new ItemStack(Material.FURNACE);
+        Material furnaceType = block.getType();
+        ItemStack dropped = new ItemStack(furnaceType);
         ItemMeta meta = dropped.getItemMeta();
         meta.getPersistentDataContainer().set(KEY_LEVEL, PersistentDataType.INTEGER, level);
-        meta.displayName(Component.text("Upgraded Furnace Lvl " + level, NamedTextColor.GOLD));
+        String furnaceName = switch (block.getType()) {
+            case BLAST_FURNACE -> "Blast Furnace";
+            case SMOKER -> "Smoker";
+            default -> "Furnace";
+        };
+
+        meta.displayName(Component.text("Upgraded " + furnaceName + " Lvl " + level, NamedTextColor.GOLD));
         dropped.setItemMeta(meta);
         block.getWorld().dropItemNaturally(block.getLocation(), dropped);
     }
