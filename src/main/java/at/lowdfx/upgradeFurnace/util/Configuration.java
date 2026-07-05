@@ -86,8 +86,15 @@ public class Configuration {
 
                 double speed = CONFIG.getDouble(path + "speed_multiplier", level + 1.0);
                 if (!Double.isFinite(speed) || speed < 1.0) {
-                    UpgradeFurnace.LOG.warn("Ungültiger speed_multiplier '{}' für Upgrade-Level {}. Es wird 1.0 verwendet.", speed, level);
+                    UpgradeFurnace.LOG.warn("Ungültiger speed_multiplier '{}' für Upgrade-Level {}. Es wird 1.00 verwendet.", speed, level);
                     speed = 1.0;
+                }
+
+                speed = Math.round(speed * 100.0) / 100.0;
+
+                if (speed > 64.99) {
+                    UpgradeFurnace.LOG.warn("speed_multiplier '{}' für Upgrade-Level {} ist zu hoch. Es wird 64.99 verwendet.", speed, level);
+                    speed = 64.99;
                 }
 
                 String particleName = CONFIG.getString(path + "particle", "SMOKE");
