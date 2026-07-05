@@ -32,6 +32,7 @@ import at.lowdfx.upgradeFurnace.util.Perms;
 import at.lowdfx.upgradeFurnace.util.Perms.Perm;
 import org.bukkit.util.Vector;
 
+import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
 
@@ -86,7 +87,7 @@ public class UpgradeCommands implements Listener {
                     if (!player.getInventory().contains(mat, req)) {
                         Utilities.negativeSound(player);
                         player.sendMessage(UpgradeFurnace.serverMessage(
-                                Component.text("Du brauchst " + req + " " + mat.name().toLowerCase() + " für Level " + next, NamedTextColor.RED)
+                                Component.text("Du brauchst " + req + " " + mat.name().toLowerCase(Locale.ROOT) + " für Level " + next, NamedTextColor.RED)
                         ));
                         return 0;
                     }
