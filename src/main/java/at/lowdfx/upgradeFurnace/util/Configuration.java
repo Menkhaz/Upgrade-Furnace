@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Configuration {
@@ -65,7 +66,7 @@ public class Configuration {
 
                 Material material;
                 try {
-                    material = Material.valueOf(matName.toUpperCase());
+                    material = Material.valueOf(matName.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
                     UpgradeFurnace.LOG.warn("Ungültiges Material '{}' für Upgrade-Level {}. Dieses Level wird übersprungen.", matName, level);
                     continue;
@@ -84,7 +85,7 @@ public class Configuration {
                 }
 
                 double speed = CONFIG.getDouble(path + "speed_multiplier", level + 1.0);
-                if (speed < 1.0) {
+                if (!Double.isFinite(speed) || speed < 1.0) {
                     UpgradeFurnace.LOG.warn("Ungültiger speed_multiplier '{}' für Upgrade-Level {}. Es wird 1.0 verwendet.", speed, level);
                     speed = 1.0;
                 }
@@ -92,7 +93,7 @@ public class Configuration {
                 String particleName = CONFIG.getString(path + "particle", "SMOKE");
                 Particle particle;
                 try {
-                    particle = Particle.valueOf(particleName.toUpperCase());
+                    particle = Particle.valueOf(particleName.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
                     particle = Particle.SMOKE;
                     UpgradeFurnace.LOG.warn("Ungültiger Partikel '{}' für Upgrade-Level {}. Es wird SMOKE verwendet.", particleName, level);
