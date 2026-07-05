@@ -15,7 +15,7 @@ public final class LowLoader implements PluginLoader {
         // Lädt InvUI automatisch beim Start herunter
         MavenLibraryResolver resolver = new MavenLibraryResolver();
         resolver.addRepository(new RemoteRepository.Builder("xenondevs", "default", "https://repo.xenondevs.xyz/releases/").build());
-        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui:1.43"), null));
+        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui:pom:1.43"), null));
         classpathBuilder.addLibrary(resolver);
     }
 }
