@@ -18,13 +18,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.bukkit.permissions.PermissionDefault.TRUE;
 
 public final class Perms {
     public enum Perm {
-        UPGRADE_FURNACE(              "upgradefurnace.upgrade.furnace",         "/upgrade furnace",                               TRUE);
+        UPGRADE_FURNACE("upgradefurnace.upgrade.furnace", "/upgrade furnace", TRUE);
 
         private final String permission;
         private final String commands;
@@ -41,7 +42,6 @@ public final class Perms {
         }
     }
 
-
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
 
@@ -54,7 +54,7 @@ public final class Perms {
                 for (Perm perm : Perm.values()) {
                     Map<String, Object> permData = new LinkedHashMap<>();
                     permData.put("description", "Erlaubt die Benutzung von " + perm.commands);
-                    permData.put("default", perm.def.name().toLowerCase());
+                    permData.put("default", perm.def.name().toLowerCase(Locale.ROOT));
                     data.put(perm.permission, permData);
                 }
                 saveJson(data, permFile);
@@ -69,7 +69,7 @@ public final class Perms {
             if (!(o instanceof Map<?, ?> map)) return;
             manager.addPermission(new Permission(s,
                     (String) map.get("description"),
-                    PermissionDefault.valueOf(((String) map.get("default")).toUpperCase())));
+                    PermissionDefault.valueOf(((String) map.get("default")).toUpperCase(Locale.ROOT))));
         });
     }
 
