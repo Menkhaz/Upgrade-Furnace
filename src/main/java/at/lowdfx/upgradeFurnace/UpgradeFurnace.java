@@ -8,7 +8,6 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +42,7 @@ public final class UpgradeFurnace extends JavaPlugin {
 
         InvUI.getInstance().setPlugin(this);
         Configuration.init(this);
+        Messages.init(this);
 
         Perms.loadPermissions();
 
@@ -71,7 +71,7 @@ public final class UpgradeFurnace extends JavaPlugin {
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
-            registrar.register(UpgradeCommands.furnaceCommand(), "Upgrade einen Ofen für eine schnellere Produktion und im letzten Level zufällig mehr Ertrag.");
+            registrar.register(UpgradeCommands.furnaceCommand(), Messages.text("help.command-description"));
 
             Plugin lowd = getServer()
                     .getPluginManager()
@@ -98,9 +98,10 @@ public final class UpgradeFurnace extends JavaPlugin {
                     reg.invoke(
                             null,                            // static
                             "upgrade",               // command
-                            MiniMessage.miniMessage().deserialize("Ofen upgraden"), // usage
-                            MiniMessage.miniMessage().deserialize("<gray>Mit diesem Befehl kannst du deinen Ofen upgraden für eine schnellere Produktion und im letzten Level für zufällig mehr Ertrag.<newline></gray>" +
-                                    "<yellow>· /upgrade furnace</yellow>"),
+                            Messages.component("help.title"), // usage
+                            Messages.component("help.description")
+                                    .append(Component.newline())
+                                    .append(Component.text("/upgrade", NamedTextColor.YELLOW)),
                             null,                            // adminDetailed
                             "upgradefurnace.upgrade.furnace",        // permission
                             null                             // adminPermission

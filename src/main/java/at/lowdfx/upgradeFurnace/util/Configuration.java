@@ -15,6 +15,7 @@ import java.util.Map;
 public class Configuration {
     public static FileConfiguration CONFIG;
 
+    public static String LANGUAGE;
     public static String BASIC_SERVER_NAME;
     public static boolean BASIC_CUSTOM_HELP;
 
@@ -35,6 +36,7 @@ public class Configuration {
     }
 
     private static void loadValues() {
+        LANGUAGE = CONFIG.getString("language", "en");
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");
         BASIC_CUSTOM_HELP = CONFIG.getBoolean("basic.customhelp", true);
 

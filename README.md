@@ -85,7 +85,7 @@ requirements:
 
 | Option | Description |
 |--------|-------------|
-| `language` | Stored in config and reported to bStats. Player-facing localization is not currently implemented. |
+| `language` | Message language for player-facing plugin text. Supported defaults are `en` and `de`. |
 | `basic.server-name` | Prefix shown before plugin messages. |
 | `basic.customhelp` | Enables registration with the optional LowdFX custom help system when available. |
 | `particles.enabled` | Enables or disables all furnace particle effects. |
@@ -120,11 +120,20 @@ requirements:
 - **Spiral Particles**: Continuous ascending spiral animation around upgraded furnaces.
 - **Upgrade Particles**: Burst effect when upgrading a furnace.
 
-## Localization Status
+## Localization
 
-The default config includes `language: "en"`, but language switching is not currently implemented for player-facing messages. The setting is only reported through the plugin's bStats chart.
+The plugin ships with English and German message files:
 
-Most in-game messages are currently hard-coded in German. To support real localization, the plugin still needs language files such as `messages_en.yml` and `messages_de.yml`, plus a message lookup helper that reads `language` from `config.yml`.
+- `messages_en.yml`
+- `messages_de.yml`
+
+Set the language in `config.yml`:
+
+```yaml
+language: "en"
+```
+
+Use `language: "de"` for German. If a selected language file is missing, the plugin falls back to English. Missing message keys also fall back to English.
 
 ## Development & Contribution
 

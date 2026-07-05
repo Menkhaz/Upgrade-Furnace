@@ -28,11 +28,13 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import at.lowdfx.upgradeFurnace.UpgradeFurnace;
 import at.lowdfx.upgradeFurnace.util.Configuration;
+import at.lowdfx.upgradeFurnace.util.Messages;
 import at.lowdfx.upgradeFurnace.util.Perms;
 import at.lowdfx.upgradeFurnace.util.Perms.Perm;
 import org.bukkit.util.Vector;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -55,7 +57,7 @@ public class UpgradeCommands implements Listener {
                     if (furnace == null) {
                         Utilities.negativeSound(player);
                         player.sendMessage(UpgradeFurnace.serverMessage(
-                                Component.text("Schau auf einen Ofen!", NamedTextColor.RED)
+                                Messages.component("furnace.no-target").color(NamedTextColor.RED)
                         ));
                         return 0;
                     }
@@ -66,7 +68,7 @@ public class UpgradeCommands implements Listener {
                     if (current >= 5) {
                         Utilities.negativeSound(player);
                         player.sendMessage(UpgradeFurnace.serverMessage(
-                                Component.text("Dieser Ofen ist bereits auf höchstem Level!", NamedTextColor.YELLOW)
+                                Messages.component("furnace.max-level").color(NamedTextColor.YELLOW)
                         ));
                         return 1;
                     }
@@ -79,7 +81,7 @@ public class UpgradeCommands implements Listener {
                     if (mat == null) {
                         Utilities.negativeSound(player);
                         player.sendMessage(UpgradeFurnace.serverMessage(
-                                Component.text("Fehler in der Config: Material ungültig.", NamedTextColor.RED)
+                                Messages.component("furnace.invalid-material").color(NamedTextColor.RED)
                         ));
                         return 0;
                     }
@@ -87,7 +89,11 @@ public class UpgradeCommands implements Listener {
                     if (!player.getInventory().contains(mat, req)) {
                         Utilities.negativeSound(player);
                         player.sendMessage(UpgradeFurnace.serverMessage(
-                                Component.text("Du brauchst " + req + " " + mat.name().toLowerCase(Locale.ROOT) + " für Level " + next, NamedTextColor.RED)
+                                Messages.component("furnace.missing-material", Map.of(
+                                        "amount", String.valueOf(req),
+                                        "material", mat.name().toLowerCase(Locale.ROOT),
+                                        "level", String.valueOf(next)
+                                )).color(NamedTextColor.RED)
                         ));
                         return 0;
                     }
@@ -95,7 +101,10 @@ public class UpgradeCommands implements Listener {
                     if (xpReq > 0 && player.getLevel() < xpReq) {
                         Utilities.negativeSound(player);
                         player.sendMessage(UpgradeFurnace.serverMessage(
-                                Component.text("Du benötigst mindestens " + xpReq + " Erfahrungslevel für Level " + next, NamedTextColor.RED)
+                                Messages.component("furnace.missing-xp", Map.of(
+                                        "xp", String.valueOf(xpReq),
+                                        "level", String.valueOf(next)
+                                )).color(NamedTextColor.RED)
                         ));
                         return 0;
                     }
@@ -114,7 +123,7 @@ public class UpgradeCommands implements Listener {
 
                     Utilities.positiveSound(player);
                     player.sendMessage(UpgradeFurnace.serverMessage(
-                            Component.text("Ofen auf Level " + next + " geupgraded!", NamedTextColor.GREEN)
+                            Messages.component("furnace.upgraded", Map.of("level", String.valueOf(next))).color(NamedTextColor.GREEN)
                     ));
 
                     return 1;

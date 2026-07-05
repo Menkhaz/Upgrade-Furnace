@@ -1,0 +1,16 @@
+furnace:
+  no-target: "Look at a furnace!"
+  max-level: "This furnace is already at the highest level!"
+  invalid-material: "Config error: invalid material."
+  missing-material: "You need {amount} {material} for level {level}."
+  missing-xp: "You need at least {xp} experience levels for level {level}."
+  upgraded: "Furnace upgraded to level {level}!"
+
+help:
+  command-description: "Upgrade a furnace for faster production and bonus output at higher levels."
+  title: "Upgrade furnace"
+  description: "Use this command to upgrade your furnace for faster production and bonus output."
+
+update:
+  available: "An update is available: version {version}. Download: {link}"
+  check-failed: "Update check for {player} failed: {error}"

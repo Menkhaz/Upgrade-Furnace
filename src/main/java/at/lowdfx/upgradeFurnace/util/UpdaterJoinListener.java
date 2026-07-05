@@ -1,6 +1,6 @@
 package at.lowdfx.upgradeFurnace.util;
 
-import io.papermc.paper.plugin.configuration.PluginMeta;
+import at.lowdfx.upgradeFurnace.UpgradeFurnace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 
 public class UpdaterJoinListener implements Listener {
 
@@ -51,12 +52,19 @@ public class UpdaterJoinListener implements Listener {
                 if (!currentVersion.equals(latestVersion)) {
                     // Neue Version verfügbar, Nachricht im Hauptthread senden
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
-                        player.sendMessage("§6§l[LowdFX] §eEs gibt ein Update: §6§lVersion " + latestVersion +
-                                " §eist verfügbar! §e§lDownload: §9" + downloadLink);
+                        player.sendMessage(UpgradeFurnace.serverMessage(
+                                Messages.component("update.available", Map.of(
+                                        "version", latestVersion,
+                                        "link", downloadLink
+                                ))
+                        ));
                     });
                 }
             } catch (Exception e) {
-                plugin.getLogger().warning("Update-Check für " + player.getName() + " fehlgeschlagen: " + e.getMessage());
+                plugin.getLogger().warning(Messages.text("update.check-failed", Map.of(
+                        "player", player.getName(),
+                        "error", String.valueOf(e.getMessage())
+                )));
             }
         });
     }

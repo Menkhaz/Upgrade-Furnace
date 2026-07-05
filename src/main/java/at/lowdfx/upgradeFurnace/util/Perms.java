@@ -25,7 +25,7 @@ import static org.bukkit.permissions.PermissionDefault.TRUE;
 
 public final class Perms {
     public enum Perm {
-        UPGRADE_FURNACE("upgradefurnace.upgrade.furnace", "/upgrade furnace", TRUE);
+        UPGRADE_FURNACE("upgradefurnace.upgrade.furnace", "/upgrade", TRUE);
 
         private final String permission;
         private final String commands;

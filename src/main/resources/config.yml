@@ -7,13 +7,15 @@
 ##                               Configuration                                ##
 #################################################################################
 
+## Language used for player-facing plugin messages.
+## Supported by default: "en", "de".
 language: "en"
 
 ## General settings.
 basic:
 
   # Prefix used before plugin messages.
-  server-name: "LoudCraft"
+  server-name: "MyServer"
 
   # Enable or disable the plugin's custom /help command.
   customhelp: true

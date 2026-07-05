@@ -1,0 +1,16 @@
+furnace:
+  no-target: "Schau auf einen Ofen!"
+  max-level: "Dieser Ofen ist bereits auf höchstem Level!"
+  invalid-material: "Fehler in der Config: Material ungültig."
+  missing-material: "Du brauchst {amount} {material} für Level {level}."
+  missing-xp: "Du benötigst mindestens {xp} Erfahrungslevel für Level {level}."
+  upgraded: "Ofen auf Level {level} geupgraded!"
+
+help:
+  command-description: "Upgrade einen Ofen für schnellere Produktion und Bonus-Ertrag auf höheren Leveln."
+  title: "Ofen upgraden"
+  description: "Mit diesem Befehl kannst du deinen Ofen für schnellere Produktion und Bonus-Ertrag upgraden."
+
+update:
+  available: "Es gibt ein Update: Version {version}. Download: {link}"
+  check-failed: "Update-Check für {player} fehlgeschlagen: {error}"
