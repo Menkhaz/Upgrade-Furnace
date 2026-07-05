@@ -27,7 +27,6 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("xyz.xenondevs.invui:invui:1.43")
-    implementation("de.tr7zw:item-nbt-api:2.14.1")
 }
 
 tasks {
