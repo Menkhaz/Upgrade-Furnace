@@ -153,34 +153,44 @@ public class UpgradeCommands implements Listener {
         if (!(block.getState() instanceof Furnace furnace)) return;
         PersistentDataContainer pdc = furnace.getPersistentDataContainer();
         int level = pdc.getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
+        if (level <= 0) return;
+
         removeHologram(furnace);
         // Aus Partikel-Animation entfernen
         if (UpgradeFurnace.PARTICLE_MANAGER != null) {
             UpgradeFurnace.PARTICLE_MANAGER.unregisterFurnace(furnace.getLocation());
         }
-        furnace.update();
         evt.setDropItems(false);
+
+        for (ItemStack content : furnace.getInventory().getContents()) {
+            if (content != null && !content.getType().isAir()) {
+                block.getWorld().dropItemNaturally(block.getLocation(), content);
+            }
+        }
+
         Material furnaceType = block.getType();
         ItemStack dropped = new ItemStack(furnaceType);
         ItemMeta meta = dropped.getItemMeta();
-        meta.getPersistentDataContainer().set(KEY_LEVEL, PersistentDataType.INTEGER, level);
-        String furnaceName = switch (block.getType()) {
-            case BLAST_FURNACE -> "Blast Furnace";
-            case SMOKER -> "Smoker";
-            default -> "Furnace";
-        };
+        if (meta != null) {
+            meta.getPersistentDataContainer().set(KEY_LEVEL, PersistentDataType.INTEGER, level);
+            String furnaceName = switch (block.getType()) {
+                case BLAST_FURNACE -> "Blast Furnace";
+                case SMOKER -> "Smoker";
+                default -> "Furnace";
+            };
 
-        String tierName = switch (level) {
-            case 1 -> "Copper";
-            case 2 -> "Iron";
-            case 3 -> "Gold";
-            case 4 -> "Diamond";
-            case 5 -> "Netherite";
-            default -> "";
-        };
+            String tierName = switch (level) {
+                case 1 -> "Copper";
+                case 2 -> "Iron";
+                case 3 -> "Gold";
+                case 4 -> "Diamond";
+                case 5 -> "Netherite";
+                default -> "";
+            };
 
-        meta.displayName(Component.text(tierName + " " + furnaceName, NamedTextColor.GOLD));
-        dropped.setItemMeta(meta);
+            meta.displayName(Component.text(tierName + " " + furnaceName, NamedTextColor.GOLD));
+            dropped.setItemMeta(meta);
+        }
         block.getWorld().dropItemNaturally(block.getLocation(), dropped);
     }
 
