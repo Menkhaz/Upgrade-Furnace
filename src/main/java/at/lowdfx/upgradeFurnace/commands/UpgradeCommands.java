@@ -253,12 +253,16 @@ public class UpgradeCommands implements Listener {
         PersistentDataContainer pdc = furnace.getPersistentDataContainer();
         pdc.set(KEY_HOLO, PersistentDataType.STRING, holo.getUniqueId().toString());
         furnace.update();
-        Location center = furnace.getBlock().getLocation().add(0.5, 0.5, 0.5);
-        Particle particle = Configuration.getParticle(level);
-        furnace.getWorld().spawnParticle(particle, center, 20, 1.0, 0.5, 1.0, 0.05);
+        if (Configuration.PARTICLES_ENABLED) {
+            Location center = furnace.getBlock().getLocation().add(0.5, 0.5, 0.5);
+            Particle particle = Configuration.getParticle(level);
+            furnace.getWorld().spawnParticle(particle, center, 20, 1.0, 0.5, 1.0, 0.05);
+        }
     }
 
     private void spawnSmeltParticles(Furnace furnace, int level) {
+        if (!Configuration.PARTICLES_ENABLED) return;
+
         Location loc = furnace.getBlock().getLocation().add(0.5, 0.3, 0.5);
         BlockData data = furnace.getBlock().getBlockData();
         if (data instanceof Directional directional) {
