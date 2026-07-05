@@ -71,7 +71,7 @@ public final class UpgradeFurnace extends JavaPlugin {
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
-            registrar.register(UpgradeCommands.furnaceCommand(), "Upgrade einen Ofen für eine schnellere Produktion und im letzten Level zufällig mehr Ertrag.");
+            registrar.register(UpgradeCommands.furnaceCommand(), "Upgrade einen Ofen für eine schnellere Produktion und im letzten Level zufällig mehr Ertrag.");
 
             Plugin lowd = getServer()
                     .getPluginManager()
