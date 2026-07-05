@@ -2,7 +2,7 @@
 name: UpgradeFurnace
 
 ### Build Version ###
-version: '1.0.0'
+version: '2.0.0'
 
 ### Main Class ###
 main: at.lowdfx.upgradeFurnace.UpgradeFurnace
@@ -16,6 +16,7 @@ api-version: '1.21'
 ### Autoren ###
 authors:
   - LowdFX
+  - Menkhaz
 
 ### Dependencies ###
 dependencies:

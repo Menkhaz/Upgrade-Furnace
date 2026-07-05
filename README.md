@@ -147,4 +147,4 @@ Use `language: "de"` for German. If a selected language file is missing, the plu
 This plugin is released under the GPL License. See [LICENSE](LICENSE) for details.
 
 ---
-Made by LowdFX
+Made by LowdFX and Menkhaz
