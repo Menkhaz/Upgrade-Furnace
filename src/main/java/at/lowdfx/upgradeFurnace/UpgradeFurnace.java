@@ -74,7 +74,7 @@ public final class UpgradeFurnace extends JavaPlugin {
 
             Plugin lowd = getServer()
                     .getPluginManager()
-                    .getPlugin("LowdFX"); // genau so, wie es in der Konsole steht
+                    .getPlugin("LowdFX"); // Match the plugin name shown by the server.
 
             if (lowd != null && Configuration.BASIC_CUSTOM_HELP) {
                 try {
