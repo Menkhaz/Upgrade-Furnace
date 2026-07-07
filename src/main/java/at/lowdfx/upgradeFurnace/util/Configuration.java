@@ -28,6 +28,8 @@ public class Configuration {
     public static final Map<Integer, Integer> REQUIRE_XP_LEVELS = new HashMap<>();
     public static final Map<Integer, Double> SPEED_MULTIPLIER = new HashMap<>();
     public static final Map<Integer, Particle> PARTICLE = new HashMap<>();
+    public static final Map<Integer, Double> BONUS_CHANCE = new HashMap<>();
+    public static final Map<Integer, Integer> BONUS_MAX_ITEMS = new HashMap<>();
 
     public static void init(@NotNull JavaPlugin plugin) {
         plugin.saveDefaultConfig();
@@ -41,13 +43,15 @@ public class Configuration {
         BASIC_CUSTOM_HELP = CONFIG.getBoolean("basic.customhelp", true);
 
         PARTICLES_ENABLED = CONFIG.getBoolean("particles.enabled", true);
-        PARTICLES_ONLY_WHEN_ACTIVE = CONFIG.getBoolean("particles.only_when_active", true);
+        PARTICLES_ONLY_WHEN_ACTIVE = CONFIG.getBoolean("particles.only_when_active", false);
 
         REQUIRE_MATERIAL.clear();
         REQUIRE_AMOUNT.clear();
         REQUIRE_XP_LEVELS.clear();
         SPEED_MULTIPLIER.clear();
         PARTICLE.clear();
+        BONUS_CHANCE.clear();
+        BONUS_MAX_ITEMS.clear();
 
         ConfigurationSection section = CONFIG.getConfigurationSection("requirements");
         if (section == null) {
@@ -108,11 +112,30 @@ public class Configuration {
                     UpgradeFurnace.LOG.warn("Ungültiger Partikel '{}' für Upgrade-Level {}. Es wird SMOKE verwendet.", particleName, level);
                 }
 
+                double bonusChance = CONFIG.getDouble(path + "bonus_chance", 0.0);
+                if (!Double.isFinite(bonusChance) || bonusChance < 0.0) {
+                    UpgradeFurnace.LOG.warn("Invalid bonus_chance '{}' for upgrade level {}. Using 0.00.", bonusChance, level);
+                    bonusChance = 0.0;
+                }
+                if (bonusChance > 1.0) {
+                    UpgradeFurnace.LOG.warn("bonus_chance '{}' for upgrade level {} is too high. Using 1.00.", bonusChance, level);
+                    bonusChance = 1.0;
+                }
+                bonusChance = Math.round(bonusChance * 100.0) / 100.0;
+
+                int bonusMaxItems = CONFIG.getInt(path + "bonus_max_items", 0);
+                if (bonusMaxItems < 0) {
+                    UpgradeFurnace.LOG.warn("Invalid bonus_max_items '{}' for upgrade level {}. Using 0.", bonusMaxItems, level);
+                    bonusMaxItems = 0;
+                }
+
                 REQUIRE_MATERIAL.put(level, material);
                 REQUIRE_AMOUNT.put(level, amount);
                 REQUIRE_XP_LEVELS.put(level, xp);
                 SPEED_MULTIPLIER.put(level, speed);
                 PARTICLE.put(level, particle);
+                BONUS_CHANCE.put(level, bonusChance);
+                BONUS_MAX_ITEMS.put(level, bonusMaxItems);
             } catch (NumberFormatException e) {
                 UpgradeFurnace.LOG.warn("Ungültiges Upgrade-Level '{}'. Level-Schlüssel müssen Zahlen sein.", key);
             }
@@ -137,6 +160,14 @@ public class Configuration {
 
     public static Particle getParticle(int level) {
         return PARTICLE.getOrDefault(level, Particle.SMOKE);
+    }
+
+    public static double getBonusChance(int level) {
+        return BONUS_CHANCE.getOrDefault(level, 0.0);
+    }
+
+    public static int getBonusMaxItems(int level) {
+        return BONUS_MAX_ITEMS.getOrDefault(level, 0);
     }
 
     public static FileConfiguration get() {

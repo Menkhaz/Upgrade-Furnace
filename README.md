@@ -10,7 +10,7 @@ _**A PaperMC 1.21 - 1.21.11 plugin to upgrade furnaces for faster smelting and b
 
 - **5 Tiered Furnace Upgrades**: Upgrade a furnace from level 1 to 5 using configurable materials.
 - **Configurable Smelting Speed**: Each level has its own speed multiplier.
-- **Bonus Yield**: Higher-level furnaces can produce extra output when smelting.
+- **Configurable Bonus Yield**: Higher-level furnaces can produce controlled extra output when smelting.
 - **Holographic Display**: Shows the current upgrade level above upgraded furnaces.
 - **Spiral Particle Animation**: Displays continuous ascending spiral particles around upgraded furnaces.
 - **Configurable Particles**: Define custom particles for each level in `config.yml`.
@@ -45,12 +45,15 @@ particles:
   only_when_active: false
 
 requirements:
+  # UpgradeFurnace is intentionally balanced around levels 1 through 5.
   1:
     material: COPPER_INGOT
     amount: 16
     xp_levels: 5
     speed_multiplier: 1.15      # Divides cook time (higher = faster)
     particle: SMOKE             # Particle effect for this level
+    bonus_chance: 0.0           # Chance from 0.0 to 1.0 for bonus output
+    bonus_max_items: 0          # Max extra items if bonus output succeeds
 
   2:
     material: IRON_INGOT
@@ -58,6 +61,8 @@ requirements:
     xp_levels: 10
     speed_multiplier: 1.35
     particle: FLAME
+    bonus_chance: 0.10
+    bonus_max_items: 1
 
   3:
     material: GOLD_INGOT
@@ -65,6 +70,8 @@ requirements:
     xp_levels: 15
     speed_multiplier: 2.0
     particle: CLOUD
+    bonus_chance: 0.16
+    bonus_max_items: 1
 
   4:
     material: DIAMOND
@@ -72,6 +79,8 @@ requirements:
     xp_levels: 20
     speed_multiplier: 4.0
     particle: SOUL_FIRE_FLAME
+    bonus_chance: 0.22
+    bonus_max_items: 2
 
   5:
     material: NETHERITE_INGOT
@@ -79,6 +88,8 @@ requirements:
     xp_levels: 30
     speed_multiplier: 8.0
     particle: TOTEM_OF_UNDYING
+    bonus_chance: 0.30
+    bonus_max_items: 2
 ```
 
 ### Configuration Options
@@ -95,6 +106,8 @@ requirements:
 | `requirements.<level>.xp_levels` | XP levels required for the upgrade. |
 | `requirements.<level>.speed_multiplier` | Cook time divisor. Higher values mean faster smelting. |
 | `requirements.<level>.particle` | Particle effect displayed for that upgrade level. |
+| `requirements.<level>.bonus_chance` | Chance from `0.0` to `1.0` to add bonus output after smelting. |
+| `requirements.<level>.bonus_max_items` | Maximum extra items added when bonus output succeeds. |
 
 ## Commands
 

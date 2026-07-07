@@ -42,6 +42,7 @@ import java.util.UUID;
 public class UpgradeCommands implements Listener {
     private static final NamespacedKey KEY_LEVEL = new NamespacedKey("upgradefurnace", "level");
     private static final NamespacedKey KEY_HOLO = new NamespacedKey("upgradefurnace", "hologram");
+    private static final NamespacedKey KEY_HOLO_OWNER = new NamespacedKey("upgradefurnace", "hologram_owner");
     private static final Random RANDOM = new Random();
 
     public static LiteralCommandNode<CommandSourceStack> furnaceCommand() {
@@ -65,6 +66,7 @@ public class UpgradeCommands implements Listener {
                     PersistentDataContainer pdc = furnace.getPersistentDataContainer();
                     int current = pdc.getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
 
+                    // UpgradeFurnace is intentionally balanced around five tiers.
                     if (current >= 5) {
                         Utilities.negativeSound(player);
                         player.sendMessage(UpgradeFurnace.serverMessage(
@@ -117,7 +119,7 @@ public class UpgradeCommands implements Listener {
                     furnace.update();
 
                     removeHologram(furnace);
-                    spawnHologram(furnace, next);
+                    ensureHologram(furnace, next);
                     if (UpgradeFurnace.PARTICLE_MANAGER != null) {
                         UpgradeFurnace.PARTICLE_MANAGER.updateFurnace(furnace.getLocation(), next);
                     }
@@ -149,10 +151,12 @@ public class UpgradeCommands implements Listener {
         Integer level = furnace.getPersistentDataContainer().get(KEY_LEVEL, PersistentDataType.INTEGER);
         if (level == null || level <= 1) return;
         ItemStack result = evt.getResult();
-        int amount = result.getAmount();
-        if (level == 5) amount *= (1 + RANDOM.nextInt(4));
-        else if (level == 4) amount *= (1 + RANDOM.nextInt(3));
-        else for (int i = 0; i < level; i++) if (RANDOM.nextDouble() < 0.3) amount++;
+        double bonusChance = Configuration.getBonusChance(level);
+        int maxBonusItems = Configuration.getBonusMaxItems(level);
+        if (bonusChance <= 0.0 || maxBonusItems <= 0 || RANDOM.nextDouble() >= bonusChance) return;
+
+        int amount = result.getAmount() + 1 + RANDOM.nextInt(maxBonusItems);
+        amount = Math.min(amount, result.getMaxStackSize());
         result.setAmount(amount);
         evt.setResult(result);
         spawnSmeltParticles(furnace, level);
@@ -206,7 +210,7 @@ public class UpgradeCommands implements Listener {
             pdc.set(KEY_LEVEL, PersistentDataType.INTEGER, level);
             furnace.customName(getFurnaceName(block.getType(), level));
             furnace.update();
-            spawnHologram(furnace, level);
+            ensureHologram(furnace, level);
             // Für Partikel-Animation registrieren
             if (UpgradeFurnace.PARTICLE_MANAGER != null) {
                 UpgradeFurnace.PARTICLE_MANAGER.registerFurnace(furnace.getLocation(), level);
@@ -242,19 +246,40 @@ public class UpgradeCommands implements Listener {
     private static void removeHologram(Furnace furnace) {
         PersistentDataContainer pdc = furnace.getPersistentDataContainer();
 
-        if (!pdc.has(KEY_HOLO, PersistentDataType.STRING)) return;
-
         String uuidStr = pdc.get(KEY_HOLO, PersistentDataType.STRING);
-        if (uuidStr == null) return;
+        if (uuidStr != null) {
+            try {
+                UUID uuid = UUID.fromString(uuidStr);
+                Entity e = furnace.getWorld().getEntity(uuid);
+                if (e != null) e.remove();
+            } catch (Exception ignored) {}
+        }
 
-        try {
-            UUID uuid = UUID.fromString(uuidStr);
-            Entity e = furnace.getWorld().getEntity(uuid);
-            if (e != null) e.remove();
-        } catch (Exception ignored) {}
-
+        removeOwnedHolograms(furnace, null);
         pdc.remove(KEY_HOLO);
         furnace.update();
+    }
+
+    public static void ensureHologram(Furnace furnace, int level) {
+        String ownerKey = ownerKey(furnace);
+        PersistentDataContainer pdc = furnace.getPersistentDataContainer();
+        String uuidStr = pdc.get(KEY_HOLO, PersistentDataType.STRING);
+
+        if (uuidStr != null) {
+            try {
+                Entity entity = furnace.getWorld().getEntity(UUID.fromString(uuidStr));
+                if (entity instanceof ArmorStand armorStand
+                        && ownerKey.equals(armorStand.getPersistentDataContainer().get(KEY_HOLO_OWNER, PersistentDataType.STRING))) {
+                    armorStand.customName(Component.text("Level " + level, NamedTextColor.RED));
+                    removeOwnedHolograms(furnace, armorStand.getUniqueId());
+                    return;
+                }
+                if (entity != null) entity.remove();
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        removeOwnedHolograms(furnace, null);
+        spawnHologram(furnace, level);
     }
 
     private static void spawnHologram(Furnace furnace, int level) {
@@ -265,6 +290,7 @@ public class UpgradeCommands implements Listener {
         holo.setGravity(false);
         holo.setVisible(false);
         holo.setMarker(true);
+        holo.getPersistentDataContainer().set(KEY_HOLO_OWNER, PersistentDataType.STRING, ownerKey(furnace));
         PersistentDataContainer pdc = furnace.getPersistentDataContainer();
         pdc.set(KEY_HOLO, PersistentDataType.STRING, holo.getUniqueId().toString());
         furnace.update();
@@ -273,6 +299,24 @@ public class UpgradeCommands implements Listener {
             Particle particle = Configuration.getParticle(level);
             furnace.getWorld().spawnParticle(particle, center, 20, 1.0, 0.5, 1.0, 0.05);
         }
+    }
+
+    private static void removeOwnedHolograms(Furnace furnace, UUID keep) {
+        String ownerKey = ownerKey(furnace);
+        Location loc = furnace.getBlock().getLocation().add(0.5, 1.2, 0.5);
+        for (Entity entity : furnace.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)) {
+            if (!(entity instanceof ArmorStand armorStand)) continue;
+            if (keep != null && keep.equals(armorStand.getUniqueId())) continue;
+            String owner = armorStand.getPersistentDataContainer().get(KEY_HOLO_OWNER, PersistentDataType.STRING);
+            if (ownerKey.equals(owner)) {
+                armorStand.remove();
+            }
+        }
+    }
+
+    private static String ownerKey(Furnace furnace) {
+        Location loc = furnace.getBlock().getLocation();
+        return loc.getWorld().getUID() + ":" + loc.getBlockX() + ":" + loc.getBlockY() + ":" + loc.getBlockZ();
     }
 
     private void spawnSmeltParticles(Furnace furnace, int level) {

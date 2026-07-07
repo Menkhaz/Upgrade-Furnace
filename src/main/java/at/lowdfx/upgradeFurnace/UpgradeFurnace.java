@@ -51,10 +51,9 @@ public final class UpgradeFurnace extends JavaPlugin {
             LOG.info("Starting FurnaceParticleManager...");
             PARTICLE_MANAGER = new FurnaceParticleManager();
             PARTICLE_MANAGER.start();
-            FurnaceLoader.registerLoadedFurnaces();
-
-            getServer().getPluginManager().registerEvents(new FurnaceLoader(), this);
         }
+        FurnaceLoader.registerLoadedFurnaces();
+        getServer().getPluginManager().registerEvents(new FurnaceLoader(), this);
 
         // Plugin Updater
         String updateUrl = "https://raw.githubusercontent.com/LowdFX/Upgrade-Furnace/refs/heads/main/update.txt";

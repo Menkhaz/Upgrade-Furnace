@@ -1,5 +1,6 @@
 package at.lowdfx.upgradeFurnace;
 
+import at.lowdfx.upgradeFurnace.commands.UpgradeCommands;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -25,8 +26,6 @@ public class FurnaceLoader implements Listener {
     }
 
     private static void registerFurnacesInChunk(Chunk chunk) {
-        if (UpgradeFurnace.PARTICLE_MANAGER == null) return;
-
         for (BlockState state : chunk.getTileEntities()) {
             if (!(state instanceof Furnace furnace)) continue;
 
@@ -34,7 +33,10 @@ public class FurnaceLoader implements Listener {
                     .getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
 
             if (level > 0) {
-                UpgradeFurnace.PARTICLE_MANAGER.registerFurnace(furnace.getLocation(), level);
+                UpgradeCommands.ensureHologram(furnace, level);
+                if (UpgradeFurnace.PARTICLE_MANAGER != null) {
+                    UpgradeFurnace.PARTICLE_MANAGER.registerFurnace(furnace.getLocation(), level);
+                }
             }
         }
     }

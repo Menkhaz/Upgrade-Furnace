@@ -67,6 +67,7 @@ public final class Perms {
         PluginManager manager = Bukkit.getPluginManager();
         loadJson(permFile).forEach((s, o) -> {
             if (!(o instanceof Map<?, ?> map)) return;
+            if (manager.getPermission(s) != null) return;
             manager.addPermission(new Permission(s,
                     (String) map.get("description"),
                     PermissionDefault.valueOf(((String) map.get("default")).toUpperCase(Locale.ROOT))));
