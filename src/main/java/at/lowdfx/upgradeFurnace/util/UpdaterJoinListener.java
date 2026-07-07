@@ -21,11 +21,11 @@ public class UpdaterJoinListener implements Listener {
     private final String downloadLink;
 
     /**
-     * Erzeugt einen neuen UpdaterJoinListener.
+     * Creates a new updater join listener.
      *
-     * @param plugin       Das Hauptplugin.
-     * @param updateUrl    Die URL, unter der die neueste Version als Text verfügbar ist.
-     * @param downloadLink Der Downloadlink zur neuen Version.
+     * @param plugin       the main plugin
+     * @param updateUrl    URL where the latest version is available as text
+     * @param downloadLink download link for the new version
      */
     public UpdaterJoinListener(JavaPlugin plugin, String updateUrl, String downloadLink) {
         this.plugin = plugin;
@@ -36,7 +36,7 @@ public class UpdaterJoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (!player.isOp()) return; // Nur OPs sollen informiert werden
+        if (!player.isOp()) return; // Only OPs should be notified.
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
@@ -50,7 +50,7 @@ public class UpdaterJoinListener implements Listener {
 
                 String currentVersion = plugin.getPluginMeta().getVersion();
                 if (!currentVersion.equals(latestVersion)) {
-                    // Neue Version verfügbar, Nachricht im Hauptthread senden
+                    // New version available; send the message on the main thread.
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
                         player.sendMessage(UpgradeFurnace.serverMessage(
                                 Messages.component("update.available", Map.of(

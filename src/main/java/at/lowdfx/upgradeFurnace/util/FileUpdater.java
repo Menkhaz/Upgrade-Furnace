@@ -17,11 +17,10 @@ public final class FileUpdater {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     /**
-     * Vergleicht die vorhandene YAML-Datei mit der Standardversion (aus den Ressourcen)
-     * und fügt alle fehlenden Einträge hinzu.
+     * Compares an existing YAML file with the bundled default resource and adds missing entries.
      *
-     * @param plugin   die Plugin-Instanz
-     * @param fileName Name der YAML-Datei (z. B. "config.yml")
+     * @param plugin   the plugin instance
+     * @param fileName YAML file name, for example "config.yml"
      */
     public static void updateYaml(JavaPlugin plugin, String fileName) {
         File file = new File(plugin.getDataFolder(), fileName);
@@ -33,12 +32,12 @@ public final class FileUpdater {
             mergeDefaultsYaml(currentConfig, defaultConfig);
             try {
                 currentConfig.save(file);
-                plugin.getLogger().info(fileName + " wurde aktualisiert.");
+                plugin.getLogger().info(fileName + " was updated.");
             } catch (IOException e) {
-                plugin.getLogger().severe("Konnte " + fileName + " nicht speichern: " + e.getMessage());
+                plugin.getLogger().severe("Could not save " + fileName + ": " + e.getMessage());
             }
         } else {
-            plugin.getLogger().warning("Standard-Konfigurationsdatei " + fileName + " nicht gefunden.");
+            plugin.getLogger().warning("Default configuration file " + fileName + " was not found.");
         }
     }
 
@@ -52,11 +51,10 @@ public final class FileUpdater {
     }
 
     /**
-     * Vergleicht die vorhandene JSON-Datei mit der Standardversion (aus den Ressourcen)
-     * und fügt alle fehlenden Einträge hinzu.
+     * Compares an existing JSON file with the bundled default resource and adds missing entries.
      *
-     * @param plugin   die Plugin-Instanz
-     * @param fileName Name der JSON-Datei (z. B. "Permissions.json")
+     * @param plugin   the plugin instance
+     * @param fileName JSON file name, for example "permissions.json"
      */
     public static void updateJson(JavaPlugin plugin, String fileName) {
         File file = new File(plugin.getDataFolder(), fileName);
@@ -65,7 +63,7 @@ public final class FileUpdater {
             try (FileReader reader = new FileReader(file)) {
                 currentJson = GSON.fromJson(reader, JsonObject.class);
             } catch (IOException e) {
-                plugin.getLogger().severe("Fehler beim Lesen von " + fileName + ": " + e.getMessage());
+                plugin.getLogger().severe("Error reading " + fileName + ": " + e.getMessage());
             }
         }
         if (currentJson == null) {
@@ -78,20 +76,20 @@ public final class FileUpdater {
             try (InputStreamReader reader = new InputStreamReader(defStream, StandardCharsets.UTF_8)) {
                 defaultJson = GSON.fromJson(reader, JsonObject.class);
             } catch (IOException e) {
-                plugin.getLogger().severe("Fehler beim Lesen der Standard-" + fileName + ": " + e.getMessage());
+                plugin.getLogger().severe("Error reading default " + fileName + ": " + e.getMessage());
             }
             if (defaultJson != null) {
                 mergeDefaultsJson(currentJson, defaultJson);
                 try (FileWriter writer = new FileWriter(file)) {
                     GSON.toJson(currentJson, writer);
-                    plugin.getLogger().info(fileName + " wurde aktualisiert.");
+                    plugin.getLogger().info(fileName + " was updated.");
                 } catch (IOException e) {
-                    plugin.getLogger().severe("Fehler beim Speichern von " + fileName + ": " + e.getMessage());
+                    plugin.getLogger().severe("Error saving " + fileName + ": " + e.getMessage());
                 }
             }
         } else {
-            // Wenn keine Standard-Ressource gefunden wird, wird hier keine Warnung mehr ausgegeben.
-            // plugin.getLogger().warning("Standard-Ressource für " + fileName + " nicht gefunden.");
+            // No warning is logged when no default resource exists.
+            // plugin.getLogger().warning("Default resource for " + fileName + " was not found.");
         }
     }
 
@@ -100,7 +98,7 @@ public final class FileUpdater {
             if (!current.has(entry.getKey())) {
                 current.add(entry.getKey(), entry.getValue());
             } else if (entry.getValue().isJsonObject() && current.get(entry.getKey()).isJsonObject()) {
-                // Rekursives Zusammenführen, falls beide Werte JsonObjects sind
+                // Recursively merge when both values are JSON objects.
                 mergeDefaultsJson(current.getAsJsonObject(entry.getKey()), entry.getValue().getAsJsonObject());
             }
         }

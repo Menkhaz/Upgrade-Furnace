@@ -171,7 +171,7 @@ public class UpgradeCommands implements Listener {
         if (level <= 0) return;
 
         removeHologram(furnace);
-        // Aus Partikel-Animation entfernen
+        // Remove from particle animation.
         if (UpgradeFurnace.PARTICLE_MANAGER != null) {
             UpgradeFurnace.PARTICLE_MANAGER.unregisterFurnace(furnace.getLocation());
         }
@@ -211,7 +211,7 @@ public class UpgradeCommands implements Listener {
             furnace.customName(getFurnaceName(block.getType(), level));
             furnace.update();
             ensureHologram(furnace, level);
-            // Für Partikel-Animation registrieren
+            // Register for particle animation.
             if (UpgradeFurnace.PARTICLE_MANAGER != null) {
                 UpgradeFurnace.PARTICLE_MANAGER.registerFurnace(furnace.getLocation(), level);
             }

@@ -22,7 +22,7 @@ public class Configuration {
     public static boolean PARTICLES_ENABLED;
     public static boolean PARTICLES_ONLY_WHEN_ACTIVE;
 
-    // Upgrade-Anforderungen aus der Config
+    // Upgrade requirements from the config.
     public static final Map<Integer, Material> REQUIRE_MATERIAL = new HashMap<>();
     public static final Map<Integer, Integer> REQUIRE_AMOUNT = new HashMap<>();
     public static final Map<Integer, Integer> REQUIRE_XP_LEVELS = new HashMap<>();
@@ -55,7 +55,7 @@ public class Configuration {
 
         ConfigurationSection section = CONFIG.getConfigurationSection("requirements");
         if (section == null) {
-            UpgradeFurnace.LOG.warn("Der Config-Bereich 'requirements' wurde nicht gefunden.");
+            UpgradeFurnace.LOG.warn("The config section 'requirements' was not found.");
             return;
         }
 
@@ -66,7 +66,7 @@ public class Configuration {
 
                 String matName = CONFIG.getString(path + "material");
                 if (matName == null || matName.isBlank()) {
-                    UpgradeFurnace.LOG.warn("Kein Material für Upgrade-Level {} gesetzt. Dieses Level wird übersprungen.", level);
+                    UpgradeFurnace.LOG.warn("No material set for upgrade level {}. Skipping this level.", level);
                     continue;
                 }
 
@@ -74,32 +74,32 @@ public class Configuration {
                 try {
                     material = Material.valueOf(matName.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
-                    UpgradeFurnace.LOG.warn("Ungültiges Material '{}' für Upgrade-Level {}. Dieses Level wird übersprungen.", matName, level);
+                    UpgradeFurnace.LOG.warn("Invalid material '{}' for upgrade level {}. Skipping this level.", matName, level);
                     continue;
                 }
 
                 int amount = CONFIG.getInt(path + "amount");
                 if (amount <= 0) {
-                    UpgradeFurnace.LOG.warn("Ungültige Anzahl '{}' für Upgrade-Level {}. Die Anzahl muss größer als 0 sein. Dieses Level wird übersprungen.", amount, level);
+                    UpgradeFurnace.LOG.warn("Invalid amount '{}' for upgrade level {}. The amount must be greater than 0. Skipping this level.", amount, level);
                     continue;
                 }
 
                 int xp = CONFIG.getInt(path + "xp_levels", 0);
                 if (xp < 0) {
-                    UpgradeFurnace.LOG.warn("Ungültige XP-Level '{}' für Upgrade-Level {}. Es wird 0 verwendet.", xp, level);
+                    UpgradeFurnace.LOG.warn("Invalid XP level cost '{}' for upgrade level {}. Using 0.", xp, level);
                     xp = 0;
                 }
 
                 double speed = CONFIG.getDouble(path + "speed_multiplier", level + 1.0);
                 if (!Double.isFinite(speed) || speed < 1.0) {
-                    UpgradeFurnace.LOG.warn("Ungültiger speed_multiplier '{}' für Upgrade-Level {}. Es wird 1.00 verwendet.", speed, level);
+                    UpgradeFurnace.LOG.warn("Invalid speed_multiplier '{}' for upgrade level {}. Using 1.00.", speed, level);
                     speed = 1.0;
                 }
 
                 speed = Math.round(speed * 100.0) / 100.0;
 
                 if (speed > 64.99) {
-                    UpgradeFurnace.LOG.warn("speed_multiplier '{}' für Upgrade-Level {} ist zu hoch. Es wird 64.99 verwendet.", speed, level);
+                    UpgradeFurnace.LOG.warn("speed_multiplier '{}' for upgrade level {} is too high. Using 64.99.", speed, level);
                     speed = 64.99;
                 }
 
@@ -109,7 +109,7 @@ public class Configuration {
                     particle = Particle.valueOf(particleName.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
                     particle = Particle.SMOKE;
-                    UpgradeFurnace.LOG.warn("Ungültiger Partikel '{}' für Upgrade-Level {}. Es wird SMOKE verwendet.", particleName, level);
+                    UpgradeFurnace.LOG.warn("Invalid particle '{}' for upgrade level {}. Using SMOKE.", particleName, level);
                 }
 
                 double bonusChance = CONFIG.getDouble(path + "bonus_chance", 0.0);
@@ -137,7 +137,7 @@ public class Configuration {
                 BONUS_CHANCE.put(level, bonusChance);
                 BONUS_MAX_ITEMS.put(level, bonusMaxItems);
             } catch (NumberFormatException e) {
-                UpgradeFurnace.LOG.warn("Ungültiges Upgrade-Level '{}'. Level-Schlüssel müssen Zahlen sein.", key);
+                UpgradeFurnace.LOG.warn("Invalid upgrade level '{}'. Level keys must be numbers.", key);
             }
         }
     }

@@ -45,7 +45,7 @@ public final class Perms {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
 
-    // Lädt die Berechtigungen aus der permissions.json und registriert sie.
+    // Loads permissions from permissions.json and registers them.
     public static void loadPermissions() {
         Path permFile = UpgradeFurnace.PLUGIN_DIR.resolve("permissions.json");
         try {
@@ -53,15 +53,15 @@ public final class Perms {
                 Map<String, Object> data = new LinkedHashMap<>();
                 for (Perm perm : Perm.values()) {
                     Map<String, Object> permData = new LinkedHashMap<>();
-                    permData.put("description", "Erlaubt die Benutzung von " + perm.commands);
+                    permData.put("description", "Allows use of " + perm.commands);
                     permData.put("default", perm.def.name().toLowerCase(Locale.ROOT));
                     data.put(perm.permission, permData);
                 }
                 saveJson(data, permFile);
-                UpgradeFurnace.LOG.info("Permission-Konfiguration erstellt.");
+                UpgradeFurnace.LOG.info("Permission configuration created.");
             }
         } catch (IOException e) {
-            UpgradeFurnace.LOG.error("Konnte Permission-Datei nicht erstellen.");
+            UpgradeFurnace.LOG.error("Could not create permission file.");
         }
 
         PluginManager manager = Bukkit.getPluginManager();
@@ -78,7 +78,7 @@ public final class Perms {
         try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             GSON.toJson(data, writer);
         } catch (IOException e) {
-            UpgradeFurnace.LOG.error("Konnte JSON nicht speichern: " + e.getMessage());
+            UpgradeFurnace.LOG.error("Could not save JSON: " + e.getMessage());
         }
     }
 

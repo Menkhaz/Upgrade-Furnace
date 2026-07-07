@@ -1,7 +1,7 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "8.3.0" // ShadowJar ist das gleiche wie shade in Maven.
-    id("xyz.jpenilla.run-paper") version "2.2.3" // Um code zu ändern, ohne den server neu zu starten.
+    id("com.gradleup.shadow") version "8.3.0" // ShadowJar is similar to Maven shade.
+    id("xyz.jpenilla.run-paper") version "2.2.3" // Useful for running a local Paper test server.
 }
 
 group = "at.lowdfx"
@@ -31,14 +31,14 @@ dependencies {
 
 tasks {
     build {
-        dependsOn(shadowJar) // ShadowJar ist das gleiche wie shade in Maven.
+        dependsOn(shadowJar) // Build the shaded plugin jar.
     }
     runServer {
         dependsOn(shadowJar)
         minecraftVersion("1.21.11")
     }
     shadowJar {
-        archiveClassifier.set("") // Kein -all im .jar Namen.
+        archiveClassifier.set("") // Do not add -all to the jar name.
         minimize()
     }
 }

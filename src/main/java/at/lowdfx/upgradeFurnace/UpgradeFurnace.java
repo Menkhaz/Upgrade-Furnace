@@ -30,7 +30,7 @@ public final class UpgradeFurnace extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Standardkonfigurationen und Dateien werden gemerged
+        // Merge default configuration and support files.
         FileUpdater.updateYaml(this, "config.yml");
         FileUpdater.updateJson(this, "permissions.json");
         LOG = getSLF4JLogger();
@@ -62,7 +62,7 @@ public final class UpgradeFurnace extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new UpgradeCommands(), this);
 
 
-        // bStats starten
+        // Start bStats.
         int pluginId = 25566;
         Metrics metrics = new Metrics(this, pluginId);
         metrics.addCustomChart(new Metrics.SimplePie("language", () -> getConfig().getString("language")));
@@ -78,11 +78,11 @@ public final class UpgradeFurnace extends JavaPlugin {
 
             if (lowd != null && Configuration.BASIC_CUSTOM_HELP) {
                 try {
-                    // 2) Lade die API‐Klasse aus dem ClassLoader von LowdFX
+                    // Load the API class from the LowdFX class loader.
                     ClassLoader loader = lowd.getClass().getClassLoader();
                     Class<?> api = loader.loadClass("at.lowdfx.lowdfx.util.LowdFXAPI");
 
-                    // 3) Hole die Methode registerHelpEntry(...)
+                    // Look up registerHelpEntry(...).
                     Method reg = api.getMethod(
                             "registerHelpEntry",
                             String.class,
@@ -93,7 +93,7 @@ public final class UpgradeFurnace extends JavaPlugin {
                             String.class
                     );
 
-                    // 4) Rufe sie statisch auf
+                    // Invoke the static method.
                     reg.invoke(
                             null,                            // static
                             "upgrade",               // command
@@ -106,24 +106,24 @@ public final class UpgradeFurnace extends JavaPlugin {
                             null                             // adminPermission
                     );
                 } catch (ReflectiveOperationException e) {
-                    getLogger().warning("Konnte LowdFXAPI nicht aufrufen: " + e.getMessage());
+                    getLogger().warning("Could not call LowdFXAPI: " + e.getMessage());
                 }
             }
 
         });
 
-        LOG.info("UpgradeFurnace Plugin gestartet!");
+        LOG.info("UpgradeFurnace plugin enabled!");
 
     }
 
 
     @Override
     public void onDisable() {
-        // Partikel-Manager stoppen
+        // Stop the particle manager.
         if (PARTICLE_MANAGER != null) {
             PARTICLE_MANAGER.stop();
         }
-        LOG.info("UpgradeFurnace Plugin deaktiviert!");
+        LOG.info("UpgradeFurnace plugin disabled!");
     }
 
     public static @NotNull Component serverMessage(@NotNull Component message) {

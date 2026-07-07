@@ -13,7 +13,7 @@ loader: at.lowdfx.upgradeFurnace.LowLoader
 ### PaperAPI Version ###
 api-version: '1.21'
 
-### Autoren ###
+### Authors ###
 authors:
   - LowdFX
   - Menkhaz

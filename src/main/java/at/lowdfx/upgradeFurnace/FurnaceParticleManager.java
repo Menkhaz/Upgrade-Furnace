@@ -11,22 +11,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Verwaltet die kontinuierlichen Partikel-Animationen um upgradete Öfen.
- * Zeigt aufsteigende Spiral-Partikel basierend auf dem Ofen-Level.
+ * Manages continuous particle animations around upgraded furnaces.
+ * Shows ascending spiral particles based on the furnace level.
  */
 public class FurnaceParticleManager {
 
-    // Thread-safe Map für Ofen-Positionen und ihre Level
+    // Thread-safe map for furnace locations and levels.
     private final Map<Location, Integer> furnaces = new ConcurrentHashMap<>();
 
-    // Aktueller Tick-Zähler für Animation
+    // Current animation tick counter.
     private long tick = 0;
 
-    // Der laufende Task
+    // Currently running task.
     private BukkitTask task;
 
     /**
-     * Startet die Partikel-Animation.
+     * Starts the particle animation.
      */
     public void start() {
         if (task != null) return;
@@ -52,7 +52,7 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Stoppt die Partikel-Animation.
+     * Stops the particle animation.
      */
     public void stop() {
         if (task != null) {
@@ -63,7 +63,7 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Registriert einen Ofen für die Partikel-Animation.
+     * Registers a furnace for particle animation.
      */
     public void registerFurnace(Location location, int level) {
         if (level < 1) return;
@@ -73,7 +73,7 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Entfernt einen Ofen aus der Animation.
+     * Removes a furnace from the animation.
      */
     public void unregisterFurnace(Location location) {
         Location blockLoc = location.getBlock().getLocation();
@@ -81,7 +81,7 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Aktualisiert das Level eines Ofens.
+     * Updates the level of a furnace.
      */
     public void updateFurnace(Location location, int newLevel) {
         Location blockLoc = location.getBlock().getLocation();
@@ -93,44 +93,44 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Spawnt aufsteigende Spiral-Partikel um den Ofen.
+     * Spawns ascending spiral particles around the furnace.
      */
     private void spawnSpiralParticles(Location furnaceLocation, int level) {
-        // Zentrum des Ofens
+        // Furnace center.
         Location center = furnaceLocation.clone().add(0.5, 0.5, 0.5);
 
-        // Level-basierte Parameter
+        // Level-based parameters.
         double speed = getSpeedForLevel(level);
         double maxHeight = getHeightForLevel(level);
         double turns = getTurnsForLevel(level);
         Particle particle = Configuration.getParticle(level);
 
-        // Anzahl der Partikel-Punkte pro Frame (höheres Level = mehr Partikel)
+        // Number of particle points per frame. Higher levels show more particles.
         int particleCount = Math.min(level, 3);
 
         for (int i = 0; i < particleCount; i++) {
-            // Offset für mehrere Spiralarme
+            // Offset for multiple spiral arms.
             double armOffset = (2 * Math.PI / particleCount) * i;
 
-            // Berechne Position auf der Spirale
+            // Calculate the position on the spiral.
             double progress = (tick * speed) % (2 * Math.PI * turns);
             double angle = progress + armOffset;
 
-            // Radius variiert leicht für interessantere Animation
+            // Slightly vary radius for a more interesting animation.
             double radius = 0.5 + 0.1 * Math.sin(tick * 0.1);
 
-            // Berechne Y-Position (aufsteigend)
+            // Calculate ascending Y position.
             double heightProgress = (progress / (2 * Math.PI * turns));
             double y = heightProgress * maxHeight;
 
-            // Berechne X und Z auf dem Kreis
+            // Calculate X and Z on the circle.
             double x = Math.cos(angle) * radius;
             double z = Math.sin(angle) * radius;
 
-            // Spawn-Position
+            // Spawn position.
             Location particleLoc = center.clone().add(x, y, z);
 
-            // Partikel spawnen
+            // Spawn particle.
             furnaceLocation.getWorld().spawnParticle(
                 particle,
                 particleLoc,
@@ -142,7 +142,7 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Gibt die Rotationsgeschwindigkeit für das Level zurück.
+     * Returns the rotation speed for the level.
      */
     private double getSpeedForLevel(int level) {
         return switch (level) {
@@ -156,7 +156,7 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Gibt die maximale Höhe der Spirale für das Level zurück.
+     * Returns the maximum spiral height for the level.
      */
     private double getHeightForLevel(int level) {
         return switch (level) {
@@ -170,7 +170,7 @@ public class FurnaceParticleManager {
     }
 
     /**
-     * Gibt die Anzahl der turns für das Level zurück.
+     * Returns the number of turns for the level.
      */
     private double getTurnsForLevel(int level) {
         return switch (level) {
