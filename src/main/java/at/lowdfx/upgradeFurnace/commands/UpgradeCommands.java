@@ -113,6 +113,7 @@ public class UpgradeCommands implements Listener {
                     if (xpReq > 0) player.giveExpLevels(-xpReq);
 
                     pdc.set(KEY_LEVEL, PersistentDataType.INTEGER, next);
+                    furnace.customName(getFurnaceName(furnace.getBlock().getType(), next));
                     furnace.update();
 
                     removeHologram(furnace);
@@ -183,22 +184,7 @@ public class UpgradeCommands implements Listener {
         ItemMeta meta = dropped.getItemMeta();
         if (meta != null) {
             meta.getPersistentDataContainer().set(KEY_LEVEL, PersistentDataType.INTEGER, level);
-            String furnaceName = switch (block.getType()) {
-                case BLAST_FURNACE -> "Blast Furnace";
-                case SMOKER -> "Smoker";
-                default -> "Furnace";
-            };
-
-            String tierName = switch (level) {
-                case 1 -> "Copper";
-                case 2 -> "Iron";
-                case 3 -> "Gold";
-                case 4 -> "Diamond";
-                case 5 -> "Netherite";
-                default -> "";
-            };
-
-            meta.displayName(Component.text(tierName + " " + furnaceName, NamedTextColor.GOLD));
+            meta.displayName(getFurnaceName(block.getType(), level));
             dropped.setItemMeta(meta);
         }
         block.getWorld().dropItemNaturally(block.getLocation(), dropped);
@@ -218,6 +204,7 @@ public class UpgradeCommands implements Listener {
             if (level == null) return;
             PersistentDataContainer pdc = furnace.getPersistentDataContainer();
             pdc.set(KEY_LEVEL, PersistentDataType.INTEGER, level);
+            furnace.customName(getFurnaceName(block.getType(), level));
             furnace.update();
             spawnHologram(furnace, level);
             // Für Partikel-Animation registrieren
@@ -231,6 +218,25 @@ public class UpgradeCommands implements Listener {
         var block = player.getTargetBlockExact(5, FluidCollisionMode.NEVER);
         if (block == null || !(block.getState() instanceof Furnace)) return null;
         return (Furnace) block.getState();
+    }
+
+    private static Component getFurnaceName(Material type, int level) {
+        String furnaceName = switch (type) {
+            case BLAST_FURNACE -> "Blast Furnace";
+            case SMOKER -> "Smoker";
+            default -> "Furnace";
+        };
+
+        String tierName = switch (level) {
+            case 1 -> "Copper";
+            case 2 -> "Iron";
+            case 3 -> "Gold";
+            case 4 -> "Diamond";
+            case 5 -> "Netherite";
+            default -> "";
+        };
+
+        return Component.text(tierName + " " + furnaceName, NamedTextColor.GOLD);
     }
 
     private static void removeHologram(Furnace furnace) {

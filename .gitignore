@@ -114,5 +114,10 @@ gradle-app.setting
 # Common working directory
 run/
 
+# Local Codex/tooling installs
+.codex-build/
+.codex-tools/
+.codex-tmp/
+
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
