@@ -8,9 +8,3 @@ furnace:
 
 help:
   command-description: "Upgrade a furnace for faster production and bonus output at higher levels."
-  title: "Upgrade furnace"
-  description: "Use this command to upgrade your furnace for faster production and bonus output."
-
-update:
-  available: "An update is available: version {version}. Download: {link}"
-  check-failed: "Update check for {player} failed: {error}"

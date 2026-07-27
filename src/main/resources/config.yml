@@ -7,22 +7,25 @@
 ##                               Configuration                                ##
 #################################################################################
 
+## Configuration schema used for automatic migrations. Do not change manually.
+config-version: 2
+
 ## Language used for player-facing plugin messages.
 ## Supported by default: "en", "de".
 language: "en"
 
 ## General settings.
 basic:
-
   # Prefix used before plugin messages.
   server-name: "MyServer"
 
-  # Enable or disable the plugin's custom /help command.
-  customhelp: true
+## Hologram settings.
+holograms:
+  # Show or hide the level hologram above upgraded furnaces.
+  enabled: true
 
 ## Particle settings.
 particles:
-
   # Enable or disable all furnace particle effects.
   enabled: true
 

@@ -17,8 +17,8 @@ public class Configuration {
 
     public static String LANGUAGE;
     public static String BASIC_SERVER_NAME;
-    public static boolean BASIC_CUSTOM_HELP;
 
+    public static boolean HOLOGRAMS_ENABLED;
     public static boolean PARTICLES_ENABLED;
     public static boolean PARTICLES_ONLY_WHEN_ACTIVE;
 
@@ -40,8 +40,8 @@ public class Configuration {
     private static void loadValues() {
         LANGUAGE = CONFIG.getString("language", "en");
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");
-        BASIC_CUSTOM_HELP = CONFIG.getBoolean("basic.customhelp", true);
 
+        HOLOGRAMS_ENABLED = CONFIG.getBoolean("holograms.enabled", true);
         PARTICLES_ENABLED = CONFIG.getBoolean("particles.enabled", true);
         PARTICLES_ONLY_WHEN_ACTIVE = CONFIG.getBoolean("particles.only_when_active", false);
 

@@ -261,6 +261,11 @@ public class UpgradeCommands implements Listener {
     }
 
     public static void ensureHologram(Furnace furnace, int level) {
+        if (!Configuration.HOLOGRAMS_ENABLED) {
+            removeHologram(furnace);
+            return;
+        }
+
         String ownerKey = ownerKey(furnace);
         PersistentDataContainer pdc = furnace.getPersistentDataContainer();
         String uuidStr = pdc.get(KEY_HOLO, PersistentDataType.STRING);

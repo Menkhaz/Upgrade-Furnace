@@ -1,2 +1,3 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Normalize text files for consistent cross-platform builds.
+* text=auto eol=lf
+*.bat text eol=crlf

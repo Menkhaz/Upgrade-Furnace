@@ -25,7 +25,7 @@ _**A PaperMC 1.21 - 1.21.11 plugin to upgrade furnaces for faster smelting and b
 
 ## Installation
 
-1. Download the latest `UpgradeFurnace.jar` from the [SpigotMC](https://www.spigotmc.org/resources/upgrade-furnace.124315/) page.
+1. Download or build the latest `UpgradeFurnace.jar` for this repository.
 2. Place the JAR into your server's `plugins` folder.
 3. Start the server to generate the default configuration and permissions files.
 
@@ -34,11 +34,15 @@ _**A PaperMC 1.21 - 1.21.11 plugin to upgrade furnaces for faster smelting and b
 These are the current default settings shipped with the plugin:
 
 ```yaml
+config-version: 2
+
 language: "en"
 
 basic:
   server-name: "MyServer"
-  customhelp: true
+
+holograms:
+  enabled: true
 
 particles:
   enabled: true
@@ -96,9 +100,10 @@ requirements:
 
 | Option | Description |
 |--------|-------------|
+| `config-version` | Internal schema version used for automatic configuration migrations. |
 | `language` | Message language for player-facing plugin text. Supported defaults are `en` and `de`. |
 | `basic.server-name` | Prefix shown before plugin messages. |
-| `basic.customhelp` | Enables registration with the optional LowdFX custom help system when available. |
+| `holograms.enabled` | Shows or hides level holograms above upgraded furnaces. Existing holograms are removed as their chunks load. |
 | `particles.enabled` | Enables or disables all furnace particle effects. |
 | `particles.only_when_active` | If enabled, spiral particles only appear while the furnace is actively burning. |
 | `requirements.<level>.material` | Material needed for that upgrade level. |
@@ -108,6 +113,20 @@ requirements:
 | `requirements.<level>.particle` | Particle effect displayed for that upgrade level. |
 | `requirements.<level>.bonus_chance` | Chance from `0.0` to `1.0` to add bonus output after smelting. |
 | `requirements.<level>.bonus_max_items` | Maximum extra items added when bonus output succeeds. |
+
+### Configuration Migration
+
+When `config-version` is older than the bundled schema, UpgradeFurnace:
+
+1. Creates a timestamped backup of the existing configuration.
+2. Starts with the newest default configuration structure.
+3. Migrates recognized values that still have valid types and ranges.
+4. Uses current defaults for missing or invalid values.
+5. Removes settings that are no longer supported.
+6. Replaces `config.yml` only after the migrated file is written successfully.
+
+Current-version configurations are not replaced. If a supported setting is
+missing, only that setting is restored from the bundled defaults.
 
 ## Commands
 
