@@ -37,6 +37,12 @@ public class Configuration {
         loadValues();
     }
 
+    public static void reload(@NotNull JavaPlugin plugin) {
+        plugin.reloadConfig();
+        CONFIG = plugin.getConfig();
+        loadValues();
+    }
+
     private static void loadValues() {
         LANGUAGE = CONFIG.getString("language", "en");
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");

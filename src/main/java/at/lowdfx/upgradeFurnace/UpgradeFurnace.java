@@ -1,7 +1,12 @@
 package at.lowdfx.upgradeFurnace;
 
-import at.lowdfx.metrics.Metrics;
-import at.lowdfx.upgradeFurnace.commands.UpgradeCommands;
+import at.lowdfx.upgradeFurnace.commands.UpgradeCommand;
+import at.lowdfx.upgradeFurnace.commands.FurnaceHelpTopic;
+import at.lowdfx.upgradeFurnace.listeners.FurnacePersistenceListener;
+import at.lowdfx.upgradeFurnace.listeners.FurnaceSmeltListener;
+import at.lowdfx.upgradeFurnace.listeners.HologramVisibilityListener;
+import at.lowdfx.upgradeFurnace.services.FurnaceUpgradeService;
+import at.lowdfx.upgradeFurnace.services.HologramManager;
 import at.lowdfx.upgradeFurnace.util.ConfigMigrator;
 import at.lowdfx.upgradeFurnace.util.Configuration;
 import at.lowdfx.upgradeFurnace.util.FileUpdater;
@@ -25,6 +30,8 @@ public final class UpgradeFurnace extends JavaPlugin {
     public static Path PLUGIN_DIR;
     public static FurnaceParticleManager PARTICLE_MANAGER;
 
+    private FurnaceLoader furnaceLoader;
+
     @Override
     public void onEnable() {
         // Migrate config.yml and merge defaults into support files.
@@ -38,28 +45,61 @@ public final class UpgradeFurnace extends JavaPlugin {
         Messages.init(this);
 
         Perms.loadPermissions();
+        getServer().getHelpMap().addTopic(new FurnaceHelpTopic());
 
         // Start particle manager if enabled
+        PARTICLE_MANAGER = new FurnaceParticleManager();
         if (Configuration.PARTICLES_ENABLED) {
             LOG.info("Starting FurnaceParticleManager...");
-            PARTICLE_MANAGER = new FurnaceParticleManager();
             PARTICLE_MANAGER.start();
         }
-        FurnaceLoader.registerLoadedFurnaces();
-        getServer().getPluginManager().registerEvents(new FurnaceLoader(), this);
-        getServer().getPluginManager().registerEvents(new UpgradeCommands(), this);
 
-        // Start bStats.
-        int pluginId = 25566;
-        Metrics metrics = new Metrics(this, pluginId);
-        metrics.addCustomChart(new Metrics.SimplePie("language", () -> getConfig().getString("language")));
+        HologramManager hologramManager = new HologramManager(this);
+        FurnaceUpgradeService upgradeService =
+                new FurnaceUpgradeService(hologramManager, PARTICLE_MANAGER);
+        furnaceLoader =
+                new FurnaceLoader(upgradeService, hologramManager, PARTICLE_MANAGER);
+        UpgradeCommand upgradeCommand =
+                new UpgradeCommand(this, upgradeService, hologramManager);
+
+        furnaceLoader.registerLoadedFurnaces();
+        getServer().getPluginManager().registerEvents(furnaceLoader, this);
+        getServer().getPluginManager().registerEvents(
+                new FurnaceSmeltListener(upgradeService), this);
+        getServer().getPluginManager().registerEvents(
+                new FurnacePersistenceListener(
+                        upgradeService, hologramManager, PARTICLE_MANAGER),
+                this);
+        if (Configuration.HOLOGRAMS_ENABLED) {
+            getServer().getPluginManager().registerEvents(
+                    new HologramVisibilityListener(this, hologramManager),
+                    this);
+        }
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
-            registrar.register(UpgradeCommands.furnaceCommand(), Messages.text("help.command-description"));
+            registrar.register(upgradeCommand.command(), Messages.text("help.command-description"));
+            registrar.register(
+                    upgradeCommand.upgradeShortcut(),
+                    Messages.text("help.upgrade-description"));
         });
 
         LOG.info("UpgradeFurnace plugin enabled!");
+    }
+
+    public void reloadPluginSettings() {
+        ConfigMigrator.migrate(this);
+        Configuration.reload(this);
+        Messages.init(this);
+
+        if (Configuration.PARTICLES_ENABLED) {
+            PARTICLE_MANAGER.start();
+        } else {
+            PARTICLE_MANAGER.stop();
+        }
+
+        furnaceLoader.registerLoadedFurnaces();
+        LOG.info("UpgradeFurnace configuration reloaded.");
     }
 
     @Override

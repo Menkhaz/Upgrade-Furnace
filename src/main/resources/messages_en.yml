@@ -5,6 +5,37 @@ furnace:
   missing-material: "You need {amount} {material} for level {level}."
   missing-xp: "You need at least {xp} experience levels for level {level}."
   upgraded: "Furnace upgraded to level {level}!"
+  info-header: "Furnace information:"
+  info-level: "Level: {level}/{max}"
+  info-speed: "Speed: {speed}x"
+  info-bonus: "Bonus output: {chance}% chance, up to {items} extra"
+  info-next: "Next upgrade: {amount} {material} and {xp} XP levels"
+  info-max: "This furnace has reached the maximum level."
+
+admin:
+  reloaded: "Configuration and messages reloaded."
+  level-set: "Furnace level set to {level}."
+  reset: "Furnace upgrade reset."
+  not-upgraded: "This furnace is not upgraded."
+
+holograms:
+  shown: "Furnace holograms are now visible."
+  hidden: "Furnace holograms are now hidden."
+  status-shown: "Furnace holograms are currently visible."
+  status-hidden: "Furnace holograms are currently hidden."
+  globally-disabled: "Furnace holograms are disabled by the server."
 
 help:
-  command-description: "Upgrade a furnace for faster production and bonus output at higher levels."
+  command-description: "Manage furnace upgrades, holograms, and administration."
+  upgrade-description: "Upgrade the furnace you are looking at."
+  topic-title: "UpgradeFurnace Commands"
+  topic-short: "Complete command reference for UpgradeFurnace."
+  commands:
+    upgrade: "Upgrade the furnace you are looking at using the configured material and XP cost."
+    upgrade-shortcut: "Shortcut for /furnace upgrade."
+    info: "Show the targeted furnace's level, speed, bonus output, and next upgrade cost."
+    hologram-status: "Show whether furnace holograms are currently visible to you."
+    hologram-toggle: "Show or hide furnace holograms for your player."
+    admin-reload: "Reload configuration, messages, particles, and holograms. Requires upgradefurnace.admin.reload."
+    admin-set: "Set the targeted furnace directly to level 1-5 without charging a cost. Requires upgradefurnace.admin.furnace."
+    admin-reset: "Remove the targeted furnace's upgrade. Requires upgradefurnace.admin.furnace."

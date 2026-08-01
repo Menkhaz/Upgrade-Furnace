@@ -1,6 +1,8 @@
 package at.lowdfx.upgradeFurnace;
 
-import at.lowdfx.upgradeFurnace.commands.UpgradeCommands;
+import at.lowdfx.upgradeFurnace.services.FurnaceUpgradeService;
+import at.lowdfx.upgradeFurnace.services.HologramManager;
+import at.lowdfx.upgradeFurnace.util.Configuration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -9,15 +11,24 @@ import org.bukkit.block.Furnace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.NamespacedKey;
-import org.bukkit.persistence.PersistentDataType;
 
-public class FurnaceLoader implements Listener {
+public final class FurnaceLoader implements Listener {
 
-    private static final NamespacedKey KEY_LEVEL =
-            new NamespacedKey("upgradefurnace", "level");
+    private final FurnaceUpgradeService upgradeService;
+    private final HologramManager hologramManager;
+    private final FurnaceParticleManager particleManager;
 
-    public static void registerLoadedFurnaces() {
+    public FurnaceLoader(
+            FurnaceUpgradeService upgradeService,
+            HologramManager hologramManager,
+            FurnaceParticleManager particleManager
+    ) {
+        this.upgradeService = upgradeService;
+        this.hologramManager = hologramManager;
+        this.particleManager = particleManager;
+    }
+
+    public void registerLoadedFurnaces() {
         for (World world : Bukkit.getWorlds()) {
             for (Chunk chunk : world.getLoadedChunks()) {
                 registerFurnacesInChunk(chunk);
@@ -25,17 +36,17 @@ public class FurnaceLoader implements Listener {
         }
     }
 
-    private static void registerFurnacesInChunk(Chunk chunk) {
+    private void registerFurnacesInChunk(Chunk chunk) {
         for (BlockState state : chunk.getTileEntities()) {
-            if (!(state instanceof Furnace furnace)) continue;
+            if (!(state instanceof Furnace furnace)) {
+                continue;
+            }
 
-            int level = furnace.getPersistentDataContainer()
-                    .getOrDefault(KEY_LEVEL, PersistentDataType.INTEGER, 0);
-
+            int level = upgradeService.sanitizeLevel(furnace);
             if (level > 0) {
-                UpgradeCommands.ensureHologram(furnace, level);
-                if (UpgradeFurnace.PARTICLE_MANAGER != null) {
-                    UpgradeFurnace.PARTICLE_MANAGER.registerFurnace(furnace.getLocation(), level);
+                hologramManager.ensureHologram(furnace, level);
+                if (particleManager != null && Configuration.PARTICLES_ENABLED) {
+                    particleManager.registerFurnace(furnace.getLocation(), level);
                 }
             }
         }

@@ -1,0 +1,14 @@
+{
+  "upgradefurnace.upgrade.furnace": {
+    "description": "Allows use of /furnace upgrade, /furnace info, and /furnace hologram",
+    "default": "true"
+  },
+  "upgradefurnace.admin.reload": {
+    "description": "Allows use of /furnace admin reload",
+    "default": "op"
+  },
+  "upgradefurnace.admin.furnace": {
+    "description": "Allows use of /furnace admin set and /furnace admin reset",
+    "default": "op"
+  }
+}

@@ -2,13 +2,13 @@
 name: UpgradeFurnace
 
 ### Build Version ###
-version: '2.0.1'
+version: '2.1.0'
 
 ### Main Class ###
 main: at.lowdfx.upgradeFurnace.UpgradeFurnace
 
 ### PaperAPI Version ###
-api-version: '1.21'
+api-version: '1.21.11'
 
 ### Authors ###
 authors:

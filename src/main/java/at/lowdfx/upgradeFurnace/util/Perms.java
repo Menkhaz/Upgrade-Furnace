@@ -21,11 +21,20 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.bukkit.permissions.PermissionDefault.OP;
 import static org.bukkit.permissions.PermissionDefault.TRUE;
 
 public final class Perms {
     public enum Perm {
-        UPGRADE_FURNACE("upgradefurnace.upgrade.furnace", "/upgrade", TRUE);
+        UPGRADE_FURNACE(
+                "upgradefurnace.upgrade.furnace",
+                "/furnace upgrade, /furnace info, and /furnace hologram",
+                TRUE),
+        ADMIN_RELOAD("upgradefurnace.admin.reload", "/furnace admin reload", OP),
+        ADMIN_FURNACE(
+                "upgradefurnace.admin.furnace",
+                "/furnace admin set and /furnace admin reset",
+                OP);
 
         private final String permission;
         private final String commands;

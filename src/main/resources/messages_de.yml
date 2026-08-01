@@ -5,6 +5,37 @@ furnace:
   missing-material: "Du brauchst {amount} {material} für Level {level}."
   missing-xp: "Du benötigst mindestens {xp} Erfahrungslevel für Level {level}."
   upgraded: "Ofen auf Level {level} geupgraded!"
+  info-header: "Ofeninformationen:"
+  info-level: "Level: {level}/{max}"
+  info-speed: "Geschwindigkeit: {speed}x"
+  info-bonus: "Bonus-Ertrag: {chance}% Chance, bis zu {items} zusätzlich"
+  info-next: "Nächstes Upgrade: {amount} {material} und {xp} Erfahrungslevel"
+  info-max: "Dieser Ofen hat das maximale Level erreicht."
+
+admin:
+  reloaded: "Konfiguration und Nachrichten wurden neu geladen."
+  level-set: "Ofenlevel wurde auf {level} gesetzt."
+  reset: "Ofenupgrade wurde zurückgesetzt."
+  not-upgraded: "Dieser Ofen ist nicht verbessert."
+
+holograms:
+  shown: "Ofenhologramme sind jetzt sichtbar."
+  hidden: "Ofenhologramme sind jetzt ausgeblendet."
+  status-shown: "Ofenhologramme sind derzeit sichtbar."
+  status-hidden: "Ofenhologramme sind derzeit ausgeblendet."
+  globally-disabled: "Ofenhologramme sind vom Server deaktiviert."
 
 help:
-  command-description: "Upgrade einen Ofen für schnellere Produktion und Bonus-Ertrag auf höheren Leveln."
+  upgrade-description: "Verbessere den Ofen, den du ansiehst."
+  command-description: "Verwalte Ofenupgrades, Hologramme und Administration."
+  topic-title: "UpgradeFurnace-Befehle"
+  topic-short: "Vollständige Befehlsübersicht für UpgradeFurnace."
+  commands:
+    upgrade: "Verbessert den angesehenen Ofen mit den konfigurierten Material- und EP-Kosten."
+    upgrade-shortcut: "Kurzform für /furnace upgrade."
+    info: "Zeigt Level, Geschwindigkeit, Bonus-Ertrag und die nächsten Verbesserungskosten."
+    hologram-status: "Zeigt, ob Ofenhologramme für dich derzeit sichtbar sind."
+    hologram-toggle: "Blendet Ofenhologramme für deinen Spieler ein oder aus."
+    admin-reload: "Lädt Konfiguration, Nachrichten, Partikel und Hologramme neu. Benötigt upgradefurnace.admin.reload."
+    admin-set: "Setzt den angesehenen Ofen kostenlos direkt auf Level 1-5. Benötigt upgradefurnace.admin.furnace."
+    admin-reset: "Entfernt das Upgrade des angesehenen Ofens. Benötigt upgradefurnace.admin.furnace."

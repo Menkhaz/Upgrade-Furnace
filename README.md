@@ -4,7 +4,7 @@
 
 # UpgradeFurnace
 
-_**A PaperMC 1.21 - 1.21.11 plugin to upgrade furnaces for faster smelting and bonus yields.**_
+_**A PaperMC 1.21.11 and 26.1.2 plugin to upgrade furnaces for faster smelting and bonus yields.**_
 
 ## Features
 
@@ -16,12 +16,12 @@ _**A PaperMC 1.21 - 1.21.11 plugin to upgrade furnaces for faster smelting and b
 - **Configurable Particles**: Define custom particles for each level in `config.yml`.
 - **Configurable Requirements**: Define materials, amounts, XP levels, speed, and particles per level.
 - **Particle Controls**: Enable/disable particles globally or only show them while a furnace is active.
-- **Brigadier Command**: `/upgrade` upgrades the furnace you are looking at.
+- **Organized Brigadier Commands**: `/furnace` groups upgrades, information, holograms, and administration with tab completion. `/upgrade` remains a quick upgrade shortcut.
 
 ## Requirements
 
-- Java 21+
-- PaperMC 1.21 - 1.21.11
+- PaperMC 1.21.11 with Java 21+
+- PaperMC 26.1.2 with Java 25+
 
 ## Installation
 
@@ -114,6 +114,12 @@ requirements:
 | `requirements.<level>.bonus_chance` | Chance from `0.0` to `1.0` to add bonus output after smelting. |
 | `requirements.<level>.bonus_max_items` | Maximum extra items added when bonus output succeeds. |
 
+When `holograms.enabled` is `false` at startup, `/furnace hologram` is not
+registered. Changing this setting with `/furnace admin reload` updates holograms
+immediately, but changing command availability requires a server restart.
+Individual visibility preferences are stored in each player's persistent
+Minecraft data and do not create another plugin file.
+
 ### Configuration Migration
 
 When `config-version` is older than the bundled schema, UpgradeFurnace:
@@ -130,17 +136,28 @@ missing, only that setting is restored from the bundled defaults.
 
 ## Commands
 
+Run `/help furnace_commands` for the complete in-game command reference.
+
 | Command | Permission | Description |
 |---------|------------|-------------|
-| `/upgrade` | `upgradefurnace.upgrade.furnace` | Upgrade the furnace you are looking at. |
+| `/furnace upgrade` | `upgradefurnace.upgrade.furnace` | Upgrade the furnace you are looking at. |
+| `/upgrade` | `upgradefurnace.upgrade.furnace` | Shortcut for upgrading the furnace you are looking at. |
+| `/furnace info` | `upgradefurnace.upgrade.furnace` | Show the targeted furnace's current stats and next upgrade cost. |
+| `/furnace hologram` | `upgradefurnace.upgrade.furnace` | Show your current hologram visibility setting. Registered only when server holograms are enabled at startup. |
+| `/furnace hologram <on\|off>` | `upgradefurnace.upgrade.furnace` | Show or hide furnace holograms for the current player. |
+| `/furnace admin reload` | `upgradefurnace.admin.reload` | Reload configuration, messages, particles, and holograms. |
+| `/furnace admin set <1-5>` | `upgradefurnace.admin.furnace` | Set the targeted furnace to a specific level without charging a cost. |
+| `/furnace admin reset` | `upgradefurnace.admin.furnace` | Remove the targeted furnace's upgrade. |
 
-**Usage**: Look at a furnace within range and run `/upgrade`. The plugin checks your inventory and XP levels for the configured upgrade requirements.
+**Usage**: Look at a furnace within range and run `/furnace upgrade` or its `/upgrade` shortcut. The plugin checks your inventory and XP levels for the configured upgrade requirements.
 
 ## Permissions
 
 | Permission | Default | Description |
 |------------|---------|-------------|
-| `upgradefurnace.upgrade.furnace` | `true` | Allows players to upgrade furnaces. |
+| `upgradefurnace.upgrade.furnace` | `true` | Allows players to upgrade and inspect furnaces or toggle their holograms. |
+| `upgradefurnace.admin.reload` | `op` | Allows administrators to reload plugin settings. |
+| `upgradefurnace.admin.furnace` | `op` | Allows administrators to set and reset furnace levels. |
 
 ## Events & Effects
 
@@ -148,6 +165,7 @@ missing, only that setting is restored from the bundled defaults.
 - **FurnaceSmeltEvent**: Applies bonus yield at higher levels.
 - **BlockBreakEvent**: Saves the furnace upgrade level onto the dropped furnace item.
 - **BlockPlaceEvent**: Restores the upgrade level when a saved furnace item is placed again.
+- **BlockExplodeEvent / EntityExplodeEvent**: Preserves upgraded furnace items and removes their holograms when explosions destroy them.
 - **ChunkLoadEvent**: Re-registers upgraded furnaces for particle effects when chunks load.
 - **Spiral Particles**: Continuous ascending spiral animation around upgraded furnaces.
 - **Upgrade Particles**: Burst effect when upgrading a furnace.
@@ -173,6 +191,20 @@ Use `language: "de"` for German. If a selected language file is missing, the plu
 2. Clone your fork and create a feature branch.
 3. Implement changes and update the README if needed.
 4. Submit a pull request describing your changes.
+
+Run the automated test suite:
+
+```shell
+./gradlew test
+```
+
+Start either supported Paper test server (each uses its own directory under
+`run/`):
+
+```shell
+./gradlew runServer       # Paper 1.21.11 / Java 21
+./gradlew runServer2612   # Paper 26.1.2 / Java 25
+```
 
 ## License
 
