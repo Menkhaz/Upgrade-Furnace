@@ -23,6 +23,8 @@ class ConfigMigratorTest {
     private static final String DEFAULT_CONFIG = """
             config-version: 2
             language: "en"
+            progression:
+              mode: VANILLA
             basic:
               server-name: "MyServer"
             holograms:
@@ -35,6 +37,7 @@ class ConfigMigratorTest {
                 material: COPPER_INGOT
                 amount: 16
                 xp_levels: 5
+                smelting_level: 100
                 speed_multiplier: 1.15
                 particle: SMOKE
                 bonus_chance: 0.0
@@ -87,6 +90,12 @@ class ConfigMigratorTest {
                 config-version: 2
                 language: "de"
                 custom-setting: "keep-me"
+                progression:
+                  mode: MCMMO_SMELTING
+                requirements:
+                  1:
+                    amount: 42
+                    smelting_level: 175
                 """);
 
         ConfigMigrator.migrate(plugin());
@@ -96,6 +105,9 @@ class ConfigMigratorTest {
         assertEquals("keep-me", current.getString("custom-setting"));
         assertEquals("MyServer", current.getString("basic.server-name"));
         assertTrue(current.getBoolean("holograms.enabled"));
+        assertEquals("MCMMO_SMELTING", current.getString("progression.mode"));
+        assertEquals(175, current.getInt("requirements.1.smelting_level"));
+        assertEquals(42, current.getInt("requirements.1.amount"));
 
         try (var files = Files.list(temporaryDirectory)) {
             assertFalse(files.anyMatch(path ->

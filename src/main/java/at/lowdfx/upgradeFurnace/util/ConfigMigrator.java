@@ -172,7 +172,8 @@ public final class ConfigMigrator {
             if (path.endsWith(".amount")) {
                 return numericValue > 0 && numericValue == Math.rint(numericValue);
             }
-            if (path.endsWith(".xp_levels") || path.endsWith(".bonus_max_items")) {
+            if (path.endsWith(".xp_levels") || path.endsWith(".bonus_max_items")
+                    || path.endsWith(".smelting_level")) {
                 return numericValue >= 0 && numericValue == Math.rint(numericValue);
             }
             if (path.endsWith(".speed_multiplier")) {

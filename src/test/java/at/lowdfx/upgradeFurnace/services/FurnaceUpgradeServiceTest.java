@@ -47,6 +47,8 @@ class FurnaceUpgradeServiceTest {
         Configuration.REQUIRE_MATERIAL.clear();
         Configuration.REQUIRE_AMOUNT.clear();
         Configuration.REQUIRE_XP_LEVELS.clear();
+        Configuration.REQUIRE_SMELTING_LEVEL.clear();
+        Configuration.MCMMO_SMELTING = false;
         Configuration.SPEED_MULTIPLIER.clear();
         Configuration.PARTICLE.clear();
         Configuration.BONUS_CHANCE.clear();
@@ -99,6 +101,10 @@ class FurnaceUpgradeServiceTest {
 
     @Test
     void successfulUpgradeChargesPlayerAndRefreshesHologram() {
+        assertSuccessfulVanillaPurchase();
+    }
+
+    private void assertSuccessfulVanillaPurchase() {
         storedLevel(0);
         configureFirstLevel();
         Player player = mock(Player.class);
@@ -122,6 +128,92 @@ class FurnaceUpgradeServiceTest {
         verify(furnaceData).set(any(), eq(PersistentDataType.INTEGER), eq(1));
         verify(hologramManager).removeHologram(furnace);
         verify(hologramManager).ensureHologram(furnace, 1);
+    }
+
+    @Test
+    void smeltingRequirementRejectsPurchaseWithoutSpendingAnything() {
+        storedLevel(0);
+        configureFirstLevel();
+        SmeltingLevelProvider provider = mock(SmeltingLevelProvider.class);
+        Configuration.MCMMO_SMELTING = true;
+        Configuration.REQUIRE_SMELTING_LEVEL.put(1, 100);
+        when(provider.isAvailable()).thenReturn(true);
+        upgradeService = new FurnaceUpgradeService(hologramManager, null, provider);
+        Player player = mock(Player.class);
+        PlayerInventory inventory = mock(PlayerInventory.class);
+        when(player.getInventory()).thenReturn(inventory);
+        when(inventory.contains(Material.COPPER_INGOT, 16)).thenReturn(true);
+        when(provider.getLevel(player)).thenReturn(99);
+
+        var result = upgradeService.upgrade(player, furnace);
+
+        assertEquals(UpgradeStatus.MISSING_SMELTING, result.status());
+        assertEquals(100, result.requiredSmelting());
+        assertEquals(99, result.currentSmelting());
+        verify(inventory, never()).removeItem(any(ItemStack.class));
+        verify(player, never()).getLevel();
+        verify(player, never()).giveExpLevels(any(Integer.class));
+        verify(furnaceData, never()).set(any(), eq(PersistentDataType.INTEGER), any());
+    }
+
+    @Test
+    void eligibleSmeltingBuyerPaysMaterialsWithoutVanillaXp() {
+        storedLevel(2);
+        Configuration.REQUIRE_MATERIAL.put(3, Material.GOLD_INGOT);
+        Configuration.REQUIRE_AMOUNT.put(3, 16);
+        Configuration.REQUIRE_XP_LEVELS.put(3, 15);
+        Configuration.REQUIRE_SMELTING_LEVEL.put(3, 250);
+        Configuration.MCMMO_SMELTING = true;
+        SmeltingLevelProvider provider = mock(SmeltingLevelProvider.class);
+        when(provider.isAvailable()).thenReturn(true);
+        upgradeService = new FurnaceUpgradeService(hologramManager, null, provider);
+        Player player = mock(Player.class);
+        PlayerInventory inventory = mock(PlayerInventory.class);
+        when(player.getInventory()).thenReturn(inventory);
+        when(inventory.contains(Material.GOLD_INGOT, 16)).thenReturn(true);
+        when(provider.getLevel(player)).thenReturn(250);
+        Block block = mock(Block.class);
+        when(furnace.getBlock()).thenReturn(block);
+        when(block.getType()).thenReturn(Material.FURNACE);
+
+        try (MockedConstruction<ItemStack> ignored = mockConstruction(ItemStack.class)) {
+            assertEquals(UpgradeStatus.SUCCESS, upgradeService.upgrade(player, furnace).status());
+        }
+
+        verify(inventory).removeItem(any(ItemStack.class));
+        verify(player, never()).getLevel();
+        verify(player, never()).giveExpLevels(any(Integer.class));
+        verify(furnaceData).set(any(), eq(PersistentDataType.INTEGER), eq(3));
+        assertEquals(0, upgradeService.inspect(furnace).nextXp());
+    }
+
+    @Test
+    void missingMcMmoFallsBackToVanillaCosts() {
+        Configuration.MCMMO_SMELTING = true;
+        SmeltingLevelProvider provider = mock(SmeltingLevelProvider.class);
+        upgradeService = new FurnaceUpgradeService(hologramManager, null, provider);
+        assertSuccessfulVanillaPurchase();
+        verify(provider, never()).getLevel(any());
+        assertEquals(5, upgradeService.inspect(furnace).nextXp());
+    }
+
+    @Test
+    void unreadablePlayerSkillRejectsPurchaseWithoutChargingOrFallback() {
+        storedLevel(0);
+        configureFirstLevel();
+        Configuration.MCMMO_SMELTING = true;
+        SmeltingLevelProvider provider = mock(SmeltingLevelProvider.class);
+        when(provider.isAvailable()).thenReturn(true);
+        upgradeService = new FurnaceUpgradeService(hologramManager, null, provider);
+        Player player = mock(Player.class);
+        PlayerInventory inventory = mock(PlayerInventory.class);
+        when(player.getInventory()).thenReturn(inventory);
+        when(inventory.contains(Material.COPPER_INGOT, 16)).thenReturn(true);
+        when(provider.getLevel(player)).thenThrow(new IllegalStateException("Profile not loaded"));
+
+        assertEquals(UpgradeStatus.SKILL_UNAVAILABLE, upgradeService.upgrade(player, furnace).status());
+        verify(inventory, never()).removeItem(any(ItemStack.class));
+        verify(player, never()).giveExpLevels(any(Integer.class));
     }
 
     @Test

@@ -23,13 +23,28 @@ public final class FurnaceUpgradeService {
 
     private final HologramManager hologramManager;
     private final FurnaceParticleManager particleManager;
+    private final SmeltingLevelProvider smelting;
 
     public FurnaceUpgradeService(
             HologramManager hologramManager,
             FurnaceParticleManager particleManager
     ) {
+        this(hologramManager, particleManager, null);
+    }
+
+    public FurnaceUpgradeService(HologramManager hologramManager,
+            FurnaceParticleManager particleManager, SmeltingLevelProvider smelting) {
         this.hologramManager = hologramManager;
         this.particleManager = particleManager;
+        this.smelting = smelting;
+    }
+
+    public boolean usesSmelting() {
+        return Configuration.MCMMO_SMELTING && smelting != null && smelting.isAvailable();
+    }
+
+    public int getSmeltingLevel(Player player) {
+        return smelting.getLevel(player);
     }
 
     public UpgradeResult upgrade(Player player, Furnace furnace) {
@@ -41,7 +56,8 @@ public final class FurnaceUpgradeService {
         int nextLevel = currentLevel + 1;
         Material material = Configuration.getRequirementMaterial(nextLevel);
         int amount = Configuration.getRequirementAmount(nextLevel);
-        int xpLevels = Configuration.getRequirementXpLevels(nextLevel);
+        boolean useSmelting = usesSmelting();
+        int xpLevels = useSmelting ? 0 : Configuration.getRequirementXpLevels(nextLevel);
 
         if (material == null) {
             return new UpgradeResult(
@@ -50,6 +66,20 @@ public final class FurnaceUpgradeService {
         if (!player.getInventory().contains(material, amount)) {
             return new UpgradeResult(
                     UpgradeStatus.MISSING_MATERIAL, nextLevel, material, amount, xpLevels);
+        }
+        if (useSmelting) {
+            int required = Configuration.getRequirementSmeltingLevel(nextLevel);
+            int current;
+            try {
+                current = getSmeltingLevel(player);
+            } catch (IllegalStateException e) {
+                return new UpgradeResult(UpgradeStatus.SKILL_UNAVAILABLE,
+                        nextLevel, material, amount, 0);
+            }
+            if (current < required) {
+                return new UpgradeResult(UpgradeStatus.MISSING_SMELTING,
+                        nextLevel, material, amount, 0, required, current);
+            }
         }
         if (xpLevels > 0 && player.getLevel() < xpLevels) {
             return new UpgradeResult(
@@ -81,7 +111,8 @@ public final class FurnaceUpgradeService {
                 Configuration.getBonusMaxItems(level),
                 nextMaterial,
                 level < MAX_LEVEL ? Configuration.getRequirementAmount(nextLevel) : 0,
-                level < MAX_LEVEL ? Configuration.getRequirementXpLevels(nextLevel) : 0);
+                level < MAX_LEVEL && !usesSmelting()
+                        ? Configuration.getRequirementXpLevels(nextLevel) : 0);
     }
 
     public int getLevel(Furnace furnace) {
@@ -196,7 +227,9 @@ public final class FurnaceUpgradeService {
         MAX_LEVEL,
         INVALID_MATERIAL,
         MISSING_MATERIAL,
-        MISSING_XP
+        MISSING_XP,
+        MISSING_SMELTING,
+        SKILL_UNAVAILABLE
     }
 
     public record UpgradeResult(
@@ -204,8 +237,14 @@ public final class FurnaceUpgradeService {
             int level,
             Material material,
             int requiredAmount,
-            int requiredXp
+            int requiredXp,
+            int requiredSmelting,
+            int currentSmelting
     ) {
+        public UpgradeResult(UpgradeStatus status, int level, Material material,
+                int requiredAmount, int requiredXp) {
+            this(status, level, material, requiredAmount, requiredXp, 0, 0);
+        }
     }
 
     public record FurnaceInfo(

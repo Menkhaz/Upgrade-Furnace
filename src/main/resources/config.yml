@@ -14,6 +14,23 @@ config-version: 2
 ## Supported by default: "en", "de".
 language: "en"
 
+## Choose the progression mode used for all furnace upgrade purchases.
+progression:
+  # Available modes:
+  #   VANILLA (default):
+  #     Charges the material, amount, and xp_levels configured for each tier.
+  #     The smelting_level setting is ignored.
+  #   MCMMO_SMELTING:
+  #     Requires mcMMO and the buyer's minimum smelting_level for each tier.
+  #     Charges only the configured material and amount.
+  #     No vanilla XP is charged and no mcMMO skill levels are consumed.
+  #     If mcMMO is unavailable, falls back to the configured VANILLA costs
+  #     and logs a warning in the console.
+  # Example: mode: MCMMO_SMELTING
+  # Apply mode or requirement changes with /furnace admin reload.
+  # Previously purchased upgrades are preserved when changing modes.
+  mode: VANILLA
+
 ## General settings.
 basic:
   # Prefix used before plugin messages.
@@ -35,6 +52,14 @@ particles:
 ## Furnace upgrade settings.
 ## UpgradeFurnace is intentionally balanced around levels 1 through 5.
 #
+# xp_levels:
+#   Vanilla XP levels consumed in VANILLA mode or when mcMMO is unavailable.
+#
+# smelting_level:
+#   Minimum mcMMO Smelting level required in MCMMO_SMELTING mode.
+#   Skill levels are never consumed; xp_levels is ignored in this mode.
+#   Default thresholds are examples; adjust for your mcMMO leveling scale.
+#
 # speed_multiplier:
 #   Divides the furnace cook time.
 #   Higher values = faster smelting.
@@ -52,6 +77,7 @@ requirements:
     material: COPPER_INGOT
     amount: 16
     xp_levels: 5
+    smelting_level: 100
     speed_multiplier: 1.15
     particle: SMOKE
     bonus_chance: 0.0
@@ -61,6 +87,7 @@ requirements:
     material: IRON_INGOT
     amount: 24
     xp_levels: 10
+    smelting_level: 200
     speed_multiplier: 1.35
     particle: FLAME
     bonus_chance: 0.10
@@ -70,6 +97,7 @@ requirements:
     material: GOLD_INGOT
     amount: 16
     xp_levels: 15
+    smelting_level: 300
     speed_multiplier: 2.0
     particle: CLOUD
     bonus_chance: 0.16
@@ -79,6 +107,7 @@ requirements:
     material: DIAMOND
     amount: 8
     xp_levels: 20
+    smelting_level: 400
     speed_multiplier: 4.0
     particle: SOUL_FIRE_FLAME
     bonus_chance: 0.22
@@ -88,6 +117,7 @@ requirements:
     material: NETHERITE_INGOT
     amount: 1
     xp_levels: 30
+    smelting_level: 500
     speed_multiplier: 8.0
     particle: TOTEM_OF_UNDYING
     bonus_chance: 0.30

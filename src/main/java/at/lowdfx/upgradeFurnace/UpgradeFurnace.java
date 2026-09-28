@@ -7,6 +7,7 @@ import at.lowdfx.upgradeFurnace.listeners.FurnaceSmeltListener;
 import at.lowdfx.upgradeFurnace.listeners.HologramVisibilityListener;
 import at.lowdfx.upgradeFurnace.services.FurnaceUpgradeService;
 import at.lowdfx.upgradeFurnace.services.HologramManager;
+import at.lowdfx.upgradeFurnace.services.McMmoIntegration;
 import at.lowdfx.upgradeFurnace.util.ConfigMigrator;
 import at.lowdfx.upgradeFurnace.util.Configuration;
 import at.lowdfx.upgradeFurnace.util.FileUpdater;
@@ -31,6 +32,7 @@ public final class UpgradeFurnace extends JavaPlugin {
     public static FurnaceParticleManager PARTICLE_MANAGER;
 
     private FurnaceLoader furnaceLoader;
+    private McMmoIntegration mcMmoIntegration;
 
     @Override
     public void onEnable() {
@@ -43,6 +45,8 @@ public final class UpgradeFurnace extends JavaPlugin {
 
         Configuration.init(this);
         Messages.init(this);
+        mcMmoIntegration = new McMmoIntegration(this);
+        mcMmoIntegration.refresh();
 
         Perms.loadPermissions();
         getServer().getHelpMap().addTopic(new FurnaceHelpTopic());
@@ -56,7 +60,7 @@ public final class UpgradeFurnace extends JavaPlugin {
 
         HologramManager hologramManager = new HologramManager(this);
         FurnaceUpgradeService upgradeService =
-                new FurnaceUpgradeService(hologramManager, PARTICLE_MANAGER);
+                new FurnaceUpgradeService(hologramManager, PARTICLE_MANAGER, mcMmoIntegration);
         furnaceLoader =
                 new FurnaceLoader(upgradeService, hologramManager, PARTICLE_MANAGER);
         UpgradeCommand upgradeCommand =
@@ -90,6 +94,7 @@ public final class UpgradeFurnace extends JavaPlugin {
     public void reloadPluginSettings() {
         ConfigMigrator.migrate(this);
         Configuration.reload(this);
+        mcMmoIntegration.refresh();
         Messages.init(this);
 
         if (Configuration.PARTICLES_ENABLED) {

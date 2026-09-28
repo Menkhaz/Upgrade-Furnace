@@ -17,6 +17,8 @@ public class Configuration {
 
     public static String LANGUAGE;
     public static String BASIC_SERVER_NAME;
+    public static boolean MCMMO_SMELTING;
+    public static final Map<Integer, Integer> REQUIRE_SMELTING_LEVEL = new HashMap<>();
 
     public static boolean HOLOGRAMS_ENABLED;
     public static boolean PARTICLES_ENABLED;
@@ -46,6 +48,11 @@ public class Configuration {
     private static void loadValues() {
         LANGUAGE = CONFIG.getString("language", "en");
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");
+        String progression = CONFIG.getString("progression.mode", "VANILLA");
+        MCMMO_SMELTING = "MCMMO_SMELTING".equalsIgnoreCase(progression);
+        if (!MCMMO_SMELTING && !"VANILLA".equalsIgnoreCase(progression)) {
+            UpgradeFurnace.LOG.warn("Unknown progression mode '{}'. Using VANILLA.", progression);
+        }
 
         HOLOGRAMS_ENABLED = CONFIG.getBoolean("holograms.enabled", true);
         PARTICLES_ENABLED = CONFIG.getBoolean("particles.enabled", true);
@@ -54,6 +61,7 @@ public class Configuration {
         REQUIRE_MATERIAL.clear();
         REQUIRE_AMOUNT.clear();
         REQUIRE_XP_LEVELS.clear();
+        REQUIRE_SMELTING_LEVEL.clear();
         SPEED_MULTIPLIER.clear();
         PARTICLE.clear();
         BONUS_CHANCE.clear();
@@ -138,6 +146,8 @@ public class Configuration {
                 REQUIRE_MATERIAL.put(level, material);
                 REQUIRE_AMOUNT.put(level, amount);
                 REQUIRE_XP_LEVELS.put(level, xp);
+                REQUIRE_SMELTING_LEVEL.put(level,
+                        Math.max(0, CONFIG.getInt(path + "smelting_level", level * 100)));
                 SPEED_MULTIPLIER.put(level, speed);
                 PARTICLE.put(level, particle);
                 BONUS_CHANCE.put(level, bonusChance);
@@ -158,6 +168,10 @@ public class Configuration {
 
     public static int getRequirementXpLevels(int level) {
         return REQUIRE_XP_LEVELS.getOrDefault(level, 0);
+    }
+
+    public static int getRequirementSmeltingLevel(int level) {
+        return REQUIRE_SMELTING_LEVEL.getOrDefault(level, level * 100);
     }
 
     public static double getSpeedMultiplier(int level) {

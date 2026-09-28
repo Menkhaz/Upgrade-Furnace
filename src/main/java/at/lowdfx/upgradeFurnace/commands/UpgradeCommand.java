@@ -168,6 +168,22 @@ public final class UpgradeCommand {
                                 .color(NamedTextColor.RED)));
                 yield 0;
             }
+            case MISSING_SMELTING -> {
+                Utilities.negativeSound(player);
+                player.sendMessage(UpgradeFurnace.serverMessage(
+                        Messages.component("furnace.missing-smelting", Map.of(
+                                "required", String.valueOf(result.requiredSmelting()),
+                                "current", String.valueOf(result.currentSmelting()),
+                                "level", String.valueOf(result.level())))
+                                .color(NamedTextColor.RED)));
+                yield 0;
+            }
+            case SKILL_UNAVAILABLE -> {
+                Utilities.negativeSound(player);
+                player.sendMessage(UpgradeFurnace.serverMessage(
+                        Messages.component("furnace.skill-unavailable").color(NamedTextColor.RED)));
+                yield 0;
+            }
             case MISSING_XP -> {
                 Utilities.negativeSound(player);
                 player.sendMessage(UpgradeFurnace.serverMessage(
@@ -220,14 +236,30 @@ public final class UpgradeCommand {
                     .append(Messages.component("furnace.invalid-material")
                             .color(NamedTextColor.RED));
         } else {
+            String nextKey = "furnace.info-next";
+            Map<String, String> nextValues = Map.of(
+                    "amount", String.valueOf(info.nextAmount()),
+                    "material", info.nextMaterial().name().toLowerCase(Locale.ROOT),
+                    "xp", String.valueOf(info.nextXp()));
+            if (upgradeService.usesSmelting()) {
+                String current;
+                try {
+                    current = String.valueOf(upgradeService.getSmeltingLevel(player));
+                } catch (IllegalStateException e) {
+                    player.sendMessage(UpgradeFurnace.serverMessage(
+                            Messages.component("furnace.skill-unavailable").color(NamedTextColor.RED)));
+                    return 0;
+                }
+                nextKey = "furnace.info-next-smelting";
+                nextValues = Map.of(
+                        "amount", String.valueOf(info.nextAmount()),
+                        "material", info.nextMaterial().name().toLowerCase(Locale.ROOT),
+                        "required", String.valueOf(Configuration.getRequirementSmeltingLevel(info.level() + 1)),
+                        "current", current);
+            }
             message = message.append(Component.newline())
                     .append(Messages.component(
-                                    "furnace.info-next",
-                                    Map.of(
-                                            "amount", String.valueOf(info.nextAmount()),
-                                            "material", info.nextMaterial().name()
-                                                    .toLowerCase(Locale.ROOT),
-                                            "xp", String.valueOf(info.nextXp())))
+                                    nextKey, nextValues)
                             .color(NamedTextColor.GOLD));
         }
 

@@ -4,12 +4,15 @@ furnace:
   invalid-material: "Config error: invalid material."
   missing-material: "You need {amount} {material} for level {level}."
   missing-xp: "You need at least {xp} experience levels for level {level}."
+  missing-smelting: "You need mcMMO Smelting level {required} for upgrade {level}. Your level: {current}."
+  skill-unavailable: "Your mcMMO Smelting level could not be read. Please try again shortly. Nothing was charged."
   upgraded: "Furnace upgraded to level {level}!"
   info-header: "Furnace information:"
   info-level: "Level: {level}/{max}"
   info-speed: "Speed: {speed}x"
   info-bonus: "Bonus output: {chance}% chance, up to {items} extra"
   info-next: "Next upgrade: {amount} {material} and {xp} XP levels"
+  info-next-smelting: "Next upgrade: {amount} {material}. Required mcMMO Smelting level: {required}; your level: {current}. No XP cost."
   info-max: "This furnace has reached the maximum level."
 
 admin:
@@ -31,7 +34,7 @@ help:
   topic-title: "UpgradeFurnace Commands"
   topic-short: "Complete command reference for UpgradeFurnace."
   commands:
-    upgrade: "Upgrade the furnace you are looking at using the configured material and XP cost."
+    upgrade: "Upgrade the furnace you are looking at using the configured costs and progression requirements."
     upgrade-shortcut: "Shortcut for /furnace upgrade."
     info: "Show the targeted furnace's level, speed, bonus output, and next upgrade cost."
     hologram-status: "Show whether furnace holograms are currently visible to you."

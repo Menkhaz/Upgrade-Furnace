@@ -31,12 +31,34 @@ _**A PaperMC 1.21.11 and 26.1.2 plugin to upgrade furnaces for faster smelting a
 
 ## Configuration (`config.yml`)
 
+### Optional mcMMO progression
+
+Set `progression.mode: MCMMO_SMELTING` to require the buyer's mcMMO Smelting
+level instead of charging vanilla XP. Materials are still spent; skill levels
+are never spent. Set `requirements.<level>.smelting_level` for each tier
+(defaults: 100, 200, 300, 400, 500). `/furnace info` shows the required and
+current skill level alongside the material cost.
+
+The default mode is `VANILLA`. If mcMMO is absent, disabled, or its API cannot
+be loaded, the plugin warns in the console and uses the configured `xp_levels`
+costs. If an individual player's skill cannot be read while the integration is
+active, the purchase is rejected without charging anything. Changes take effect
+with `/furnace admin reload`; installing mcMMO requires a server restart.
+
+Anyone with upgrade permission can upgrade a shared furnace if they meet the
+requirements and pay the material cost. Anyone can use it afterward. Existing
+furnace upgrades are preserved when switching modes or changing requirements.
+Existing configurations receive the new settings automatically.
+
 These are the current default settings shipped with the plugin:
 
 ```yaml
 config-version: 2
 
 language: "en"
+
+progression:
+  mode: VANILLA
 
 basic:
   server-name: "MyServer"
@@ -54,6 +76,7 @@ requirements:
     material: COPPER_INGOT
     amount: 16
     xp_levels: 5
+    smelting_level: 100
     speed_multiplier: 1.15      # Divides cook time (higher = faster)
     particle: SMOKE             # Particle effect for this level
     bonus_chance: 0.0           # Chance from 0.0 to 1.0 for bonus output
@@ -63,6 +86,7 @@ requirements:
     material: IRON_INGOT
     amount: 24
     xp_levels: 10
+    smelting_level: 200
     speed_multiplier: 1.35
     particle: FLAME
     bonus_chance: 0.10
@@ -72,6 +96,7 @@ requirements:
     material: GOLD_INGOT
     amount: 16
     xp_levels: 15
+    smelting_level: 300
     speed_multiplier: 2.0
     particle: CLOUD
     bonus_chance: 0.16
@@ -81,6 +106,7 @@ requirements:
     material: DIAMOND
     amount: 8
     xp_levels: 20
+    smelting_level: 400
     speed_multiplier: 4.0
     particle: SOUL_FIRE_FLAME
     bonus_chance: 0.22
@@ -90,6 +116,7 @@ requirements:
     material: NETHERITE_INGOT
     amount: 1
     xp_levels: 30
+    smelting_level: 500
     speed_multiplier: 8.0
     particle: TOTEM_OF_UNDYING
     bonus_chance: 0.30
@@ -103,12 +130,14 @@ requirements:
 | `config-version` | Internal schema version used for automatic configuration migrations. |
 | `language` | Message language for player-facing plugin text. Supported defaults are `en` and `de`. |
 | `basic.server-name` | Prefix shown before plugin messages. |
+| `progression.mode` | `VANILLA` spends XP levels; `MCMMO_SMELTING` checks skill eligibility. Missing mcMMO falls back to vanilla. |
 | `holograms.enabled` | Shows or hides level holograms above upgraded furnaces. Existing holograms are removed as their chunks load. |
 | `particles.enabled` | Enables or disables all furnace particle effects. |
 | `particles.only_when_active` | If enabled, spiral particles only appear while the furnace is actively burning. |
 | `requirements.<level>.material` | Material needed for that upgrade level. |
 | `requirements.<level>.amount` | Amount of material required. |
-| `requirements.<level>.xp_levels` | XP levels required for the upgrade. |
+| `requirements.<level>.xp_levels` | XP level cost in vanilla mode and when falling back from mcMMO. |
+| `requirements.<level>.smelting_level` | Minimum mcMMO Smelting level in mcMMO mode; never consumed. |
 | `requirements.<level>.speed_multiplier` | Cook time divisor. Higher values mean faster smelting. |
 | `requirements.<level>.particle` | Particle effect displayed for that upgrade level. |
 | `requirements.<level>.bonus_chance` | Chance from `0.0` to `1.0` to add bonus output after smelting. |
@@ -149,7 +178,7 @@ Run `/help furnace_commands` for the complete in-game command reference.
 | `/furnace admin set <1-5>` | `upgradefurnace.admin.furnace` | Set the targeted furnace to a specific level without charging a cost. |
 | `/furnace admin reset` | `upgradefurnace.admin.furnace` | Remove the targeted furnace's upgrade. |
 
-**Usage**: Look at a furnace within range and run `/furnace upgrade` or its `/upgrade` shortcut. The plugin checks your inventory and XP levels for the configured upgrade requirements.
+**Usage**: Look at a furnace within range and run `/furnace upgrade` or its `/upgrade` shortcut. The plugin checks your inventory and the active progression requirements.
 
 ## Permissions
 
